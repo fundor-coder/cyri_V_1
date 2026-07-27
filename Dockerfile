@@ -11,7 +11,8 @@ WORKDIR /app
 # The app has no runtime npm dependencies. Keep the image small and only copy
 # the files needed by the Node server and the public frontend.
 COPY --chown=node:node package.json server.js app.js index.html styles.css \
-  robots.txt sitemap.xml site.webmanifest ./
+  robots.txt sitemap.xml site.webmanifest favicon.ico favicon.png \
+  apple-touch-icon.png ./
 COPY --chown=node:node assets ./assets
 COPY --chown=node:node content ./content
 

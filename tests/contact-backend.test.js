@@ -88,6 +88,13 @@ test("expanded article corpus is complete, bilingual and source-based", async ()
   }
 });
 
+test("production image packages the public CYRI favicon files", async () => {
+  const dockerfile = await fs.readFile(path.join(__dirname, "..", "Dockerfile"), "utf8");
+  for (const icon of ["favicon.ico", "favicon.png", "apple-touch-icon.png"]) {
+    assert.match(dockerfile, new RegExp(`\\b${icon.replace(".", "\\.")}\\b`));
+  }
+});
+
 test("contact backend validates, stores and securely delivers messages", async (t) => {
   const providerRequests = [];
   const provider = http.createServer(async (req, res) => {
