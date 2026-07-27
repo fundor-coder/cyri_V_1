@@ -786,6 +786,7 @@ h3 {
 
 .home-sdg-goal {
   display: grid;
+  width: 100%;
   min-height: 92px;
   align-content: start;
   gap: 8px;
@@ -793,7 +794,26 @@ h3 {
   border-top: 4px solid var(--sdg-color);
   border-radius: var(--radius-xs);
   background: rgba(255, 255, 255, 0.72);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
   padding: 11px;
+  text-align: left;
+  transition:
+    transform 170ms ease,
+    border-color 170ms ease,
+    box-shadow 170ms ease,
+    background 170ms ease;
+}
+
+.home-sdg-goal:hover,
+.home-sdg-goal:focus-visible {
+  z-index: 1;
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--sdg-color) 48%, transparent);
+  outline: none;
+  background: color-mix(in srgb, var(--sdg-color) 7%, #ffffff);
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--sdg-color) 18%, transparent);
 }
 
 .home-sdg-goal.is-education {
@@ -818,6 +838,106 @@ h3 {
   hyphens: none;
   line-height: 1.23;
   overflow-wrap: break-word;
+}
+
+.home-sdg-goal small {
+  margin-top: auto;
+  color: var(--sdg-color);
+  font-size: 0.68rem;
+  font-weight: 780;
+}
+
+.home-sdg-modal-panel {
+  width: min(880px, 100%);
+  overflow: hidden;
+  border-top: 8px solid var(--sdg-color);
+}
+
+.home-sdg-modal-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.28fr);
+  align-items: start;
+  gap: 30px;
+}
+
+.home-sdg-modal-logo {
+  overflow: hidden;
+  margin: 0;
+  border-radius: var(--radius-sm);
+  background: var(--sdg-color);
+  box-shadow: 0 18px 42px color-mix(in srgb, var(--sdg-color) 22%, transparent);
+}
+
+.home-sdg-modal-logo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.home-sdg-modal-copy {
+  padding-top: 8px;
+}
+
+.home-sdg-modal-copy .eyebrow {
+  color: var(--sdg-color);
+}
+
+.home-sdg-modal-copy h2 {
+  margin-bottom: 14px;
+  font-size: clamp(1.9rem, 4vw, 3.2rem);
+}
+
+.home-sdg-modal-short {
+  color: var(--ink-soft);
+  font-size: 1.04rem;
+}
+
+.home-sdg-modal-info {
+  display: grid;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.home-sdg-modal-info section {
+  border-left: 4px solid var(--sdg-color);
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+  background: color-mix(in srgb, var(--sdg-color) 7%, rgba(255, 255, 255, 0.78));
+  padding: 13px 15px;
+}
+
+.home-sdg-modal-info strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink);
+  font-size: 0.82rem;
+}
+
+.home-sdg-modal-info p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+}
+
+.home-sdg-modal-source {
+  display: grid;
+  gap: 7px;
+  margin-top: 28px;
+  border-top: 1px solid var(--glass-line);
+  padding-top: 18px;
+}
+
+.home-sdg-modal-source a {
+  width: fit-content;
+  color: var(--sdg-color);
+  font-weight: 760;
+}
+
+.home-sdg-modal-source small {
+  max-width: 720px;
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.45;
 }
 
 .home-sdg-action {
@@ -5670,6 +5790,24 @@ body[data-audience="children"] .modal-body h3 {
 
   .home-sdg-goals {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-sdg-modal-panel {
+    padding: 22px;
+  }
+
+  .home-sdg-modal-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .home-sdg-modal-logo {
+    width: min(230px, 72%);
+    margin-inline: auto;
+  }
+
+  .home-sdg-modal-copy {
+    padding-top: 0;
   }
 
   .home-sdg-action {

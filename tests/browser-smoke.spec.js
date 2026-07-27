@@ -80,6 +80,49 @@ test("five-minute path unlocks puzzles in sequence", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test("homepage SDG cards open official logo details accessibly", async ({ page }) => {
+  await setAdultMode(page, null, "de");
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("http://127.0.0.1:5173/#home");
+
+  await expect(page.locator("[data-home-sdg-goal]")).toHaveCount(17);
+  const educationGoal = page.locator('[data-home-sdg-goal="4"]');
+  await educationGoal.click();
+  const modal = page.locator("[data-home-sdg-modal]");
+  await expect(modal).toBeVisible();
+  await expect(modal.locator("[data-home-sdg-modal-title]")).toHaveText(
+    "Hochwertige Bildung"
+  );
+  await expect(modal.locator("[data-home-sdg-modal-image]")).toHaveAttribute(
+    "src",
+    "assets/sdg/E_SDG_Icons-04.jpg"
+  );
+  await expect(modal.locator("[data-home-sdg-modal-focus]")).not.toBeEmpty();
+  await expect(modal.locator("[data-home-sdg-modal-link]")).toHaveAttribute(
+    "href",
+    "https://sdgs.un.org/goals/goal4"
+  );
+  await modal.screenshot({ path: "/tmp/cyri-home-sdg-detail.png" });
+
+  await page.keyboard.press("Escape");
+  await expect(modal).toBeHidden();
+  await expect(educationGoal).toBeFocused();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator('[data-home-sdg-goal="14"]').click();
+  await expect(modal.locator("[data-home-sdg-modal-image]")).toHaveAttribute(
+    "src",
+    "assets/sdg/E_SDG_Icons-14.jpg"
+  );
+  const modalFitsViewport = await page.evaluate(() => {
+    const panel = document.querySelector("[data-home-sdg-modal-panel]");
+    const bounds = panel?.getBoundingClientRect();
+    return Boolean(bounds && bounds.left >= 0 && bounds.right <= window.innerWidth);
+  });
+  expect(modalFitsViewport).toBe(true);
+  await modal.screenshot({ path: "/tmp/cyri-home-sdg-detail-mobile.png" });
+});
+
 test("finale and certificate work on desktop", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));

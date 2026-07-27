@@ -1708,6 +1708,7 @@ const SITE_FEATURES = {
   publishActionFunding: true,
 };
 let articleModalReturnFocus = null;
+let homeSdgModalReturnFocus = null;
 let homepageArticleRotationTimer = null;
 
 const content = {
@@ -1880,6 +1881,15 @@ const content = {
       allEyebrow: "The complete overview",
       allTitle: "All 17 goals belong together.",
       goalsAria: "All 17 Sustainable Development Goals",
+      goalAria: "Open SDG {number}: {title}",
+      openGoal: "Show goal",
+      detailEyebrow: "Sustainable Development Goal {number}",
+      detailWhy: "Environmental connection",
+      detailQuestion: "Question to explore",
+      officialLink: "View this goal at the United Nations",
+      officialNote:
+        "Official SDG icon © United Nations. CYRI's explanations are independent and are not endorsed by the United Nations.",
+      logoAlt: "Official icon for SDG {number}: {title}",
       actionText:
         "In the learning section, you can test these connections through environmental challenges and the SDG Sprint.",
       actionCta: "Start environmental learning",
@@ -2544,6 +2554,15 @@ const content = {
       allEyebrow: "Die vollständige Übersicht",
       allTitle: "Alle 17 Ziele gehören zusammen.",
       goalsAria: "Alle 17 Nachhaltigkeitsziele",
+      goalAria: "SDG {number} öffnen: {title}",
+      openGoal: "Ziel anzeigen",
+      detailEyebrow: "Nachhaltigkeitsziel {number}",
+      detailWhy: "Verbindung zur Umwelt",
+      detailQuestion: "Frage zum Weiterdenken",
+      officialLink: "Dieses Ziel bei den Vereinten Nationen ansehen",
+      officialNote:
+        "Offizielles SDG-Symbol © Vereinte Nationen. Die CYRI-Erklärungen sind unabhängig und nicht von den Vereinten Nationen bestätigt.",
+      logoAlt: "Offizielles Symbol für SDG {number}: {title}",
       actionText:
         "Im Lernbereich testest du diese Zusammenhänge mit Umwelt-Challenges und dem SDG-Sprint.",
       actionCta: "Umweltbildung starten",
@@ -3240,6 +3259,7 @@ const state = {
   activeMissionRole: savedMissionLab.role,
   activeMissionPace: savedMissionLab.pace,
   activeSdg: 13,
+  activeHomeSdg: null,
   learningGameMinutes: savedGameProgress.minutes,
   completedLearningGames: savedGameProgress.completed,
   certificateIssuance: savedCertificateIssuance,
@@ -4138,17 +4158,89 @@ function renderHomepageSdgs() {
   goals.innerHTML = sdgGoals
     .map(
       (goal) => `
-        <article
+        <button
           class="home-sdg-goal${goal.number === 4 ? " is-education" : ""}"
-          role="listitem"
+          type="button"
+          data-home-sdg-goal="${goal.number}"
+          aria-label="${escapeHtml(
+            formatLearningText(t("homeSdgs.goalAria"), {
+              number: goal.number,
+              title: localizedValue(goal.title),
+            })
+          )}"
           style="--sdg-color: ${goal.color}; --sdg-ink: ${contrastText(goal.color)}"
         >
           <span>${goal.number}</span>
           <strong>${escapeHtml(localizedValue(goal.title))}</strong>
-        </article>
+          <small>${escapeHtml(t("homeSdgs.openGoal"))} →</small>
+        </button>
       `
     )
     .join("");
+}
+
+function homeSdgLogoPath(number) {
+  return `assets/sdg/E_SDG_Icons-${String(number).padStart(2, "0")}.jpg`;
+}
+
+function updateHomepageSdgModal() {
+  const modal = document.querySelector("[data-home-sdg-modal]");
+  if (!modal || !state.activeHomeSdg) return;
+  const goal = getSdgGoal(state.activeHomeSdg);
+  const title = localizedValue(goal.title);
+  const modalPanel = modal.querySelector("[data-home-sdg-modal-panel]");
+  modalPanel.style.setProperty("--sdg-color", goal.color);
+  modalPanel.style.setProperty("--sdg-ink", contrastText(goal.color));
+  modal.querySelector("[data-home-sdg-modal-eyebrow]").textContent = formatLearningText(
+    t("homeSdgs.detailEyebrow"),
+    { number: goal.number }
+  );
+  modal.querySelector("[data-home-sdg-modal-title]").textContent = title;
+  modal.querySelector("[data-home-sdg-modal-short]").textContent = localizedValue(goal.short);
+  modal.querySelector("[data-home-sdg-modal-focus-label]").textContent = t(
+    "homeSdgs.detailWhy"
+  );
+  modal.querySelector("[data-home-sdg-modal-focus]").textContent = localizedValue(goal.focus);
+  modal.querySelector("[data-home-sdg-modal-question-label]").textContent = t(
+    "homeSdgs.detailQuestion"
+  );
+  modal.querySelector("[data-home-sdg-modal-question]").textContent = localizedValue(
+    goal.question
+  );
+  const image = modal.querySelector("[data-home-sdg-modal-image]");
+  image.src = homeSdgLogoPath(goal.number);
+  image.alt = formatLearningText(t("homeSdgs.logoAlt"), {
+    number: goal.number,
+    title,
+  });
+  const officialLink = modal.querySelector("[data-home-sdg-modal-link]");
+  officialLink.href = `https://sdgs.un.org/goals/goal${goal.number}`;
+  officialLink.textContent = t("homeSdgs.officialLink");
+  modal.querySelector("[data-home-sdg-modal-note]").textContent = t(
+    "homeSdgs.officialNote"
+  );
+}
+
+function openHomepageSdg(number) {
+  homeSdgModalReturnFocus =
+    document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  state.activeHomeSdg = getSdgGoal(number).number;
+  updateHomepageSdgModal();
+  const modal = document.querySelector("[data-home-sdg-modal]");
+  modal.hidden = false;
+  modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("no-scroll");
+  modal.querySelector("[data-home-sdg-modal-close]").focus();
+}
+
+function closeHomepageSdg() {
+  const modal = document.querySelector("[data-home-sdg-modal]");
+  state.activeHomeSdg = null;
+  modal.hidden = true;
+  modal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("no-scroll");
+  homeSdgModalReturnFocus?.focus();
+  homeSdgModalReturnFocus = null;
 }
 
 function markConceptDiscovered(topicId, conceptIndex) {
@@ -6575,6 +6667,7 @@ function renderDynamicContent() {
   renderTeam();
   renderPublishTools();
   if (state.activeArticleId) updateArticleModal();
+  if (state.activeHomeSdg) updateHomepageSdgModal();
 }
 
 function parseRoute() {
@@ -6806,6 +6899,23 @@ document.addEventListener("click", (event) => {
     updateStaticText();
     renderDynamicContent();
     resetResearchAnswer();
+    return;
+  }
+
+  const homepageSdgButton = event.target.closest("[data-home-sdg-goal]");
+  if (homepageSdgButton) {
+    openHomepageSdg(Number(homepageSdgButton.dataset.homeSdgGoal));
+    return;
+  }
+
+  if (event.target.closest("[data-home-sdg-modal-close]")) {
+    closeHomepageSdg();
+    return;
+  }
+
+  const homepageSdgModal = document.querySelector("[data-home-sdg-modal]");
+  if (!homepageSdgModal.hidden && event.target === homepageSdgModal) {
+    closeHomepageSdg();
     return;
   }
 
@@ -7688,13 +7798,23 @@ window.addEventListener("hashchange", () => syncRoute(true));
 document.addEventListener("visibilitychange", scheduleHomepageArticleRotation);
 
 window.addEventListener("keydown", (event) => {
-  const modal = document.querySelector("[data-article-modal]");
+  const articleModal = document.querySelector("[data-article-modal]");
+  const homepageSdgModal = document.querySelector("[data-home-sdg-modal]");
+  const modal = !homepageSdgModal.hidden
+    ? homepageSdgModal
+    : !articleModal.hidden
+      ? articleModal
+      : null;
   if (event.key === "Escape") {
-    if (!modal.hidden) closeArticle();
+    if (!homepageSdgModal.hidden) {
+      closeHomepageSdg();
+    } else if (!articleModal.hidden) {
+      closeArticle();
+    }
     closeMenu();
     return;
   }
-  if (event.key === "Tab" && !modal.hidden) {
+  if (event.key === "Tab" && modal) {
     const focusable = [...modal.querySelectorAll('a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])')];
     if (!focusable.length) return;
     const first = focusable[0];
