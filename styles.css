@@ -393,6 +393,10 @@ img {
 
 .page.is-active {
   display: block;
+  background:
+    radial-gradient(ellipse 90% 28rem at 8% 0%, rgba(22, 131, 95, 0.13), transparent 72%),
+    radial-gradient(ellipse 82% 30rem at 94% 0%, rgba(39, 116, 216, 0.12), transparent 74%),
+    linear-gradient(180deg, rgba(231, 246, 241, 0.38), transparent 48rem);
 }
 
 .section {
@@ -408,8 +412,8 @@ img {
   padding-bottom: 92px;
   overflow: hidden;
   background:
-    linear-gradient(115deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.16) 48%, transparent),
-    linear-gradient(180deg, rgba(230, 247, 241, 0.22), transparent 72%);
+    linear-gradient(115deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.12) 52%, transparent),
+    linear-gradient(180deg, rgba(230, 247, 241, 0.16), transparent 100%);
 }
 
 .hero-inner {
@@ -3703,6 +3707,87 @@ h3 {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
+.latest-grid .article-card {
+  animation: article-rotation-enter 420ms ease both;
+}
+
+.latest-grid .article-card:nth-child(2) {
+  animation-delay: 45ms;
+}
+
+.latest-grid .article-card:nth-child(3) {
+  animation-delay: 90ms;
+}
+
+.latest-grid .article-card:nth-child(4) {
+  animation-delay: 135ms;
+}
+
+.latest-grid .article-card:nth-child(5) {
+  animation-delay: 180ms;
+}
+
+.article-rotation-controls {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 8px;
+  margin: 22px auto 0;
+  border: 1px solid var(--glass-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: var(--shadow-soft);
+  padding: 6px;
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+
+.article-rotation-step,
+.article-rotation-toggle {
+  min-height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.article-rotation-step {
+  width: 38px;
+  padding: 0;
+  font-size: 1.05rem;
+}
+
+.article-rotation-toggle {
+  padding: 7px 13px;
+}
+
+.article-rotation-step:hover,
+.article-rotation-toggle:hover {
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.article-rotation-status {
+  min-width: 104px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 680;
+  text-align: center;
+}
+
+@keyframes article-rotation-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .featured-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -3839,10 +3924,8 @@ h3 {
   padding-top: 104px;
   padding-bottom: 62px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 251, 250, 0.48)),
-    linear-gradient(120deg, rgba(39, 116, 216, 0.09), rgba(22, 131, 95, 0.07), transparent 62%);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), transparent 100%),
+    linear-gradient(120deg, rgba(39, 116, 216, 0.06), rgba(22, 131, 95, 0.04), transparent 82%);
 }
 
 .page-hero h1 {
@@ -4281,6 +4364,10 @@ h3 {
   margin: 0;
   color: var(--green);
   font-weight: 650;
+}
+
+.form-status[data-state="error"] {
+  color: #a93535;
 }
 
 .ai-translation {
@@ -5381,6 +5468,16 @@ body[data-audience="children"] .modal-body h3 {
   .hero-actions,
   .button {
     width: 100%;
+  }
+
+  .article-rotation-controls {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .article-rotation-toggle {
+    flex-basis: 100%;
   }
 
   .game-info-grid {
