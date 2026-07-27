@@ -1,4 +1,5 @@
 const { test, expect } = require("@playwright/test");
+const fs = require("node:fs/promises");
 
 const completedBeforeFinale = ["sdg-sprint", "chain-builder", "city-builder", "reef-rescue"];
 
@@ -38,6 +39,13 @@ async function expectRenderedModel(page, type) {
   });
   expect(pixels.opaque).toBeGreaterThan(300);
   expect(pixels.range).toBeGreaterThan(25);
+}
+
+async function expectHighResolutionCertificate(path) {
+  const png = await fs.readFile(path);
+  expect(png.subarray(1, 4).toString()).toBe("PNG");
+  expect(png.readUInt32BE(16)).toBe(2000);
+  expect(png.readUInt32BE(20)).toBe(1414);
 }
 
 test("five-minute path unlocks puzzles in sequence", async ({ page }) => {
@@ -140,8 +148,9 @@ test("finale and certificate work on desktop", async ({ page }) => {
   const downloadPromise = page.waitForEvent("download");
   await page.locator("[data-certificate-download]").click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toMatch(/^CYRI-Climate-Certificate-.*\.pdf$/);
-  await download.saveAs("/tmp/cyri-climate-certificate.pdf");
+  expect(download.suggestedFilename()).toMatch(/^CYRI-Climate-Certificate-.*\.png$/);
+  await download.saveAs("/tmp/cyri-climate-certificate.png");
+  await expectHighResolutionCertificate("/tmp/cyri-climate-certificate.png");
   await expect(page.locator("[data-certificate-issued]")).toBeVisible();
   expect(await page.locator("[data-certificate-download]").count()).toBe(0);
   expect(await page.locator("[data-certificate-name]").count()).toBe(0);
@@ -149,6 +158,13 @@ test("finale and certificate work on desktop", async ({ page }) => {
     JSON.parse(localStorage.getItem("cyri-certificate-issuance-v2") || "null")?.gold
   );
   expect(issuance?.id).toMatch(/^CYRI-GOLD-/);
+  expect(issuance).toMatchObject({
+    name: "Alex Klimaschützer",
+    language: "en",
+    minutes: 30,
+    missionCount: 5,
+  });
+  expect(issuance?.sdgs).toEqual([4, 6, 7, 10, 11, 12, 13, 14, 15, 17]);
   await page.screenshot({ path: "/tmp/cyri-learn-desktop.png", fullPage: true });
   page.once("dialog", (dialog) => dialog.accept());
   await page.locator("[data-learning-games-reset]").click();
@@ -159,6 +175,60 @@ test("finale and certificate work on desktop", async ({ page }) => {
   ).toBeNull();
   expect(errors).toEqual([]);
 });
+
+for (const certificateCase of [
+  {
+    tier: "bronze",
+    language: "de",
+    minutes: 5,
+    name: "Mia Öztürk",
+    completed: ["sdg-sprint", "chain-builder"],
+    missionCount: 2,
+    sdgs: [4, 11, 12, 13, 14, 17],
+  },
+  {
+    tier: "silver",
+    language: "en",
+    minutes: 15,
+    name: "Jamie Climate Researcher",
+    completed: completedBeforeFinale,
+    missionCount: 4,
+    sdgs: [4, 6, 11, 12, 13, 14, 15, 17],
+  },
+]) {
+  test(`${certificateCase.tier} certificate uses its own dynamic values`, async ({ page }) => {
+    await setAdultMode(
+      page,
+      { minutes: certificateCase.minutes, completed: certificateCase.completed },
+      certificateCase.language
+    );
+    await page.goto("http://127.0.0.1:5173/#learn");
+    await page.locator("[data-certificate-name]").fill(certificateCase.name);
+
+    const downloadPromise = page.waitForEvent("download");
+    await page.locator("[data-certificate-download]").click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toContain(certificateCase.tier.toUpperCase());
+    const outputPath = `/tmp/cyri-certificate-${certificateCase.tier}.png`;
+    await download.saveAs(outputPath);
+    await expectHighResolutionCertificate(outputPath);
+
+    const issuance = await page.evaluate((tier) => {
+      const saved = JSON.parse(localStorage.getItem("cyri-certificate-issuance-v2") || "null");
+      return saved?.[tier];
+    }, certificateCase.tier);
+    expect(issuance).toMatchObject({
+      name: certificateCase.name,
+      language: certificateCase.language,
+      minutes: certificateCase.minutes,
+      missionCount: certificateCase.missionCount,
+      sdgs: certificateCase.sdgs,
+    });
+    expect(issuance?.id).toMatch(
+      new RegExp(`^CYRI-${certificateCase.tier.toUpperCase()}-`)
+    );
+  });
+}
 
 test("city mission hides its threshold and requires experimentation", async ({ page }) => {
   const errors = [];

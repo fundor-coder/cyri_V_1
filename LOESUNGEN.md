@@ -109,9 +109,3 @@ Datenquelle: `quizQuestions` (app.js:1545). Reihenfolge wie im Code, `correct`-I
 | 10 | Kann lokaler Riffschutz globalen Klimaschutz ersetzen? | Nein, verbessert aber lokale Widerstandskraft |
 | 11 | Warum sind versiegelte Flächen bei Starkregen problematisch? | Wasser versickert schlecht, fließt schnell ab |
 | 12 | Was beschreibt „Blue Carbon" am besten? | Kohlenstoff, den Küsten-/Meeresökosysteme speichern |
-
----
-
-*Hinweis: Bei den drei Budget-Spielen (Stadt-Baumeister, Riff-Rettung, Klimarat) gibt es
-mehrere gültige Lösungen – die oben genannten sind jeweils ein Beispiel, das die
-Gewinnbedingung im Code erfüllt.*
