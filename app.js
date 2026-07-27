@@ -1701,19 +1701,19 @@ const content = {
       close: "Close",
     },
     seo: {
-      title: "CYRI | Youth-led environmental education",
+      title: "CYRI | Climate & Environmental Education for Teens",
       description:
         "CYRI is a youth-led digital info platform for climate, nature and environmental protection.",
       pages: {
         home: {
-          title: "CYRI | Youth-led environmental education",
+          title: "CYRI | Climate & Environmental Education for Teens",
           description:
-            "Explore understandable articles, interactive missions and environmental info formats on climate, nature and environmental protection.",
+            "Interactive climate, ocean and nature education for teens and teachers: source-based articles, learning games and 3D models — free and youth-led.",
         },
         learn: {
-          title: "Learn | CYRI",
+          title: "Climate Learning Games for Teens | CYRI",
           description:
-            "Play interactive environmental games for 15-19-year-olds and young adults.",
+            "Play interactive climate and environmental learning games for teens (15-19) and classrooms, from 5-minute challenges to 30-minute deep dives.",
         },
         articles: {
           title: "Articles | CYRI",
@@ -2336,19 +2336,19 @@ const content = {
       close: "Schließen",
     },
     seo: {
-      title: "CYRI | Jugendgeführte Umweltbildung",
+      title: "CYRI | Umweltbildung für Jugendliche (Klima, Natur, Ozean)",
       description:
         "CYRI ist eine jugendgeführte digitale Infoplattform für Klima-, Natur- und Umweltschutz.",
       pages: {
         home: {
-          title: "CYRI | Jugendgeführte Umweltbildung",
+          title: "CYRI | Umweltbildung für Jugendliche (Klima, Natur, Ozean)",
           description:
-            "Entdecke verständliche Artikel, interaktive Missionen und Bildungsformate zu Klima-, Natur- und Umweltschutz.",
+            "Interaktive Umweltbildung zu Klima, Ozean und Natur für Jugendliche und Lehrkräfte: quellenbasierte Artikel, Lernspiele und 3D-Modelle – kostenlos und jugendgeführt.",
         },
         learn: {
-          title: "Lernen | CYRI",
+          title: "Klima-Lernspiele für Jugendliche | CYRI",
           description:
-            "Spiele interaktive Umweltspiele für 15-19-Jährige und junge Erwachsene.",
+            "Spiele interaktive Umwelt- und Klima-Lernspiele für Jugendliche (15-19) und den Unterricht – von 5-Minuten-Challenges bis zu 30-Minuten-Vertiefungen.",
         },
         articles: {
           title: "Artikel | CYRI",
