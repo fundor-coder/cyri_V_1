@@ -123,6 +123,40 @@ test("homepage SDG cards open official logo details accessibly", async ({ page }
   await modal.screenshot({ path: "/tmp/cyri-home-sdg-detail-mobile.png" });
 });
 
+test("clean localized URLs expose page and article SEO metadata", async ({ page }) => {
+  await setAdultMode(page, null, "de");
+  await page.goto("http://127.0.0.1:5173/de/lernen");
+
+  await expect(page).toHaveURL("http://127.0.0.1:5173/de/lernen");
+  await expect(page.locator("html")).toHaveAttribute("lang", "de");
+  await expect(page).toHaveTitle(
+    "Umweltbildung & Klima-Lernen für Jugendliche | CYRI"
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    "https://cyri.online/de/lernen"
+  );
+  await expect(page.locator('[data-header] [data-route-link="about"]')).toHaveAttribute(
+    "href",
+    "/de/ueber-uns"
+  );
+
+  await page.goto(
+    "http://127.0.0.1:5173/de/artikel/schwammstadt-regenwasser-hitze-2026"
+  );
+  const articleModal = page.locator("[data-article-modal]");
+  await expect(articleModal).toBeVisible();
+  await expect(articleModal.locator("[data-modal-title]")).toContainText("Schwammstadt");
+  await expect(page).toHaveTitle(/Schwammstadt.*CYRI/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    "https://cyri.online/de/artikel/schwammstadt-regenwasser-hitze-2026"
+  );
+
+  await articleModal.locator("[data-modal-close]").click();
+  await expect(page).toHaveURL("http://127.0.0.1:5173/de/artikel");
+});
+
 test("finale and certificate work on desktop", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));

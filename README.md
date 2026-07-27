@@ -44,6 +44,17 @@ Deployment:
 - Static-only hosting is not enough for publishing, contact messages or AI answers, because those features need the backend.
 - GitHub Pages can display the frontend, but it cannot run the CYRI assistant or store published articles. Use the Node/Docker or PHP deployment as the production website when these functions must work.
 
+Google search setup:
+- German and English content uses clean, crawlable URLs such as `/de/lernen`,
+  `/en/learn` and one URL per published article. Legacy hash links are upgraded in the browser.
+- The Node server renders a unique title, description, canonical URL, language alternatives,
+  social preview metadata and JSON-LD for every public page before JavaScript runs.
+- `https://cyri.online/sitemap.xml` includes every public language route and every currently
+  published article. Submit this URL in Google Search Console after deployment.
+- Verify the `cyri.online` domain property in Search Console and request indexing for the home,
+  learning and article overview pages after major content updates. Keep publishing useful,
+  sourced environmental education content; technical metadata alone cannot guarantee rankings.
+
 Scheduled publishing:
 - Select `Schedule for later` in the protected publishing editor and choose a local date and time.
 - The browser sends the time as UTC. Future articles remain hidden from the public API until their launch time.

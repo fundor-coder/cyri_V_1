@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
-Disallow: /#publish
+Disallow: /de/publizieren
+Disallow: /en/publish
 
 Sitemap: https://cyri.online/sitemap.xml
