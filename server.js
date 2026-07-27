@@ -222,6 +222,7 @@ const researchStopWords = new Set([
 const mimeTypes = {
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
+  ".ico": "image/x-icon",
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".png": "image/png",
@@ -237,6 +238,9 @@ const PUBLIC_ROOT_FILES = new Set([
   "/",
   "/index.html",
   "/app.js",
+  "/apple-touch-icon.png",
+  "/favicon.ico",
+  "/favicon.png",
   "/styles.css",
   "/robots.txt",
   "/site.webmanifest",
@@ -248,6 +252,8 @@ const PUBLIC_CONTENT_PATHS = new Set([
 const PUBLIC_ASSET_PATHS = new Set([
   "/assets/action-funding-logo-rgb.jpg",
   "/assets/action-funding-logo-rgb.webp",
+  "/assets/cyri-logo-192.png",
+  "/assets/cyri-logo-512.png",
   "/assets/cyri-logo.svg",
   "/assets/learning-3d.js",
   "/assets/photos/aletsch-glacier-hd.jpg",
@@ -1255,7 +1261,7 @@ function structuredDataForSeo({ route, article, canonicalUrl, title, description
       name: "CYRI",
       alternateName: "Climate Youth Research Initiative",
       url: `${SITE_ORIGIN}/`,
-      logo: `${SITE_ORIGIN}/assets/cyri-logo.svg`,
+      logo: `${SITE_ORIGIN}/assets/cyri-logo-512.png`,
       description:
         route.language === "de"
           ? "Jugendgeführte Umweltbildung zu Klima, Natur und den 17 Nachhaltigkeitszielen."

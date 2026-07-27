@@ -152,6 +152,29 @@ test("contact backend validates, stores and securely delivers messages", async (
   const publicLogo = await fetch(`${baseUrl}/assets/cyri-logo.svg`);
   assert.equal(publicLogo.status, 200);
   assert.match(publicLogo.headers.get("content-type"), /^image\/svg\+xml/);
+  const faviconFiles = [
+    ["/favicon.ico", "image/x-icon"],
+    ["/favicon.png", "image/png"],
+    ["/apple-touch-icon.png", "image/png"],
+    ["/assets/cyri-logo-192.png", "image/png"],
+    ["/assets/cyri-logo-512.png", "image/png"],
+  ];
+  for (const [faviconPath, contentType] of faviconFiles) {
+    const faviconResponse = await fetch(`${baseUrl}${faviconPath}`);
+    assert.equal(faviconResponse.status, 200, faviconPath);
+    assert.match(faviconResponse.headers.get("content-type"), new RegExp(`^${contentType}`));
+    assert.ok((await faviconResponse.arrayBuffer()).byteLength > 100, faviconPath);
+  }
+  const homeResponse = await fetch(`${baseUrl}/`);
+  assert.equal(homeResponse.status, 200);
+  const homeHtml = await homeResponse.text();
+  assert.match(
+    homeHtml,
+    /<link rel="icon" href="\/favicon\.png" type="image\/png" sizes="96x96" \/>/
+  );
+  assert.match(homeHtml, /<link rel="shortcut icon" href="\/favicon\.ico" \/>/);
+  assert.match(homeHtml, /<link rel="apple-touch-icon" href="\/apple-touch-icon\.png"/);
+  assert.match(homeHtml, /https:\/\/cyri\.online\/assets\/cyri-logo-512\.png/);
 
   const privatePaths = [
     "/README.md",
