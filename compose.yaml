@@ -11,6 +11,10 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_TRANSLATION_MODEL: ${OPENAI_TRANSLATION_MODEL:-gpt-5.4-mini}
       OPENAI_RESEARCH_MODEL: ${OPENAI_RESEARCH_MODEL:-gpt-5.4-mini}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      CYRI_CONTACT_FROM: ${CYRI_CONTACT_FROM:-}
+      CYRI_CONTACT_TO: ${CYRI_CONTACT_TO:-climateyri@gmail.com}
+      CYRI_TRUST_PROXY: ${CYRI_TRUST_PROXY:-false}
     volumes:
       - cyri-data:/app/data
 

@@ -26,8 +26,8 @@
     <link rel="manifest" href="site.webmanifest" />
     <link rel="icon" href="assets/cyri-logo.svg" type="image/svg+xml" />
     <link rel="preload" href="assets/photos/coral-reef-bleaching-hd.webp" as="image" type="image/webp" fetchpriority="high" />
-    <link rel="stylesheet" href="styles.css?v=20260727-1" />
-    <script src="app.js?v=20260724-1" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260727-4" />
+    <script src="app.js?v=20260727-4" defer></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -186,6 +186,32 @@
             </div>
 
             <div class="article-grid latest-grid reveal" data-latest-articles></div>
+            <div class="article-rotation-controls" data-article-rotation-controls hidden>
+              <button
+                class="article-rotation-step"
+                type="button"
+                data-homepage-articles-step="-1"
+                data-i18n-aria="latest.previous"
+                aria-label="Previous article selection"
+              >
+                <span aria-hidden="true">←</span>
+              </button>
+              <span class="article-rotation-status" data-article-rotation-status></span>
+              <button
+                class="article-rotation-step"
+                type="button"
+                data-homepage-articles-step="1"
+                data-i18n-aria="latest.next"
+                aria-label="Next article selection"
+              >
+                <span aria-hidden="true">→</span>
+              </button>
+              <button
+                class="article-rotation-toggle"
+                type="button"
+                data-homepage-articles-toggle
+              ></button>
+            </div>
           </div>
         </section>
       </section>
@@ -372,6 +398,7 @@
                 <span>Website</span>
                 <input type="text" name="website" tabindex="-1" autocomplete="off" />
               </label>
+              <input type="hidden" name="startedAt" value="" />
               <p class="form-privacy" data-i18n="contact.privacyNote">
                 We use your details only to answer your message. Details are in the privacy notice.
               </p>
@@ -692,7 +719,7 @@
             <article class="legal-card reveal">
               <h2 data-i18n="legal.localDataTitle">Backend data</h2>
               <p data-i18n="legal.localDataText">
-                Contact messages are stored on the server only to process the request and are normally deleted after six months unless legal obligations require longer storage.
+                Contact messages are sent to CYRI through the email delivery provider Resend and stored on the server for up to six months unless legal obligations require longer storage.
               </p>
             </article>
             <article class="legal-card reveal">
@@ -704,7 +731,7 @@
             <article class="legal-card reveal">
               <h2 data-i18n="legal.processingTitle">What is processed</h2>
               <p data-i18n="legal.processingText">
-                The hosting provider may process technical log data. Contact forms process name, email address and message. The CYRI assistant sends the entered question to the configured AI provider only after consent.
+                The hosting provider and Resend may process technical and delivery data. Contact forms process name, email address and message. The CYRI assistant sends the entered question to the configured AI provider only after consent.
               </p>
             </article>
             <article class="legal-card reveal">

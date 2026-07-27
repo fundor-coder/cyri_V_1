@@ -33,7 +33,9 @@ Backend routes:
 - `POST backend.php?route=/research` answers questions using published CYRI articles as the only content basis.
 - `POST backend.php?route=/uploads` stores an optimized custom article photo in `data/uploads`.
 - `POST backend.php?route=/articles` stores a new article immediately or with a future `publishAt` time.
-- `POST backend.php?route=/contact` stores contact messages in `data/messages.json`.
+- `POST backend.php?route=/contact` validates and rate-limits contact messages, stores a
+  recoverable copy in `data/messages.json` and sends a plain-text email to the configured
+  CYRI inbox.
 - `/api/...` paths also work on Node and through the root Apache rewrite.
 
 Deployment:
@@ -53,6 +55,23 @@ AI translation:
 - The default model is `gpt-5.4-mini`. Override it with `OPENAI_TRANSLATION_MODEL` if needed.
 - Translation requests are sent only from the Node or PHP backend. Review every translation before publishing.
 
+Contact email delivery:
+- Create a Resend account, add and verify the sending subdomain `send.cyri.online`, and add the
+  SPF and DKIM records shown by Resend to the domain DNS.
+- Copy `.env.example` to `.env` on the server. Set `RESEND_API_KEY` to a sending-only API key,
+  `CYRI_CONTACT_FROM` to an address on the verified domain and `CYRI_CONTACT_TO` to
+  `climateyri@gmail.com`.
+- Never place the API key in `app.js`, `index.html`, a public hosting dashboard field or Git.
+- The visitor's validated address is used only as `Reply-To`; the fixed verified CYRI address is
+  always used as the sender to protect deliverability and prevent mail-header injection.
+- Contact requests are limited to 16 KB and five accepted attempts per IP per hour. The persistent
+  rate-limit file contains only a one-way hash of the client address. A honeypot, minimum
+  completion time and same-site browser check reject common automated abuse.
+- Messages are stored with delivery status for recovery and automatically removed after roughly
+  six months when a later contact request performs retention cleanup.
+- Set `CYRI_TRUST_PROXY=true` only behind a trusted reverse proxy that overwrites
+  `X-Forwarded-For`. Otherwise leave it `false` so visitors cannot spoof the rate-limit address.
+
 CYRI assistant:
 - Set `OPENAI_API_KEY` in the server environment. The key stays in the Node or PHP backend and is never sent to visitors.
 - The backend selects up to three relevant published CYRI articles and instructs the model to answer only from that supplied material.
@@ -63,7 +82,7 @@ CYRI assistant:
 
 Docker / Node server:
 - Build the optimized Node image with `docker build -t cyri-website .`.
-- Run it with `docker run -d --name cyri -p 5173:5173 -v cyri-data:/app/data -e CYRI_PUBLISH_PASSWORD='use-a-long-unique-secret' -e OPENAI_API_KEY='your-key' cyri-website`.
+- Run it with `docker run -d --name cyri -p 5173:5173 -v cyri-data:/app/data --env-file .env cyri-website`.
 - Publishing stays disabled until `CYRI_PUBLISH_PASSWORD` or a SHA-256 `CYRI_PUBLISH_PASSWORD_HASH` is configured. Never commit the production secret.
 - Or use `docker compose up -d --build`; `compose.yaml` automatically mounts the named `cyri-data` volume.
 - Open `http://localhost:5173/`. Published articles, uploaded photos and contact messages are stored in the `cyri-data` volume.

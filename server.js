@@ -9,10 +9,15 @@ const DATA_DIR = path.resolve(process.env.CYRI_DATA_DIR || path.join(__dirname, 
 const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
 const ARTICLES_FILE = path.join(DATA_DIR, "articles.json");
 const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
+const CONTACT_RATE_FILE = path.join(DATA_DIR, "contact-rate-limits.json");
 const STATIC_ARTICLES_FILE = path.join(PUBLIC_ROOT, "content", "articles.json");
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 12;
 const MAX_JSON_BODY_SIZE = 4 * 1024 * 1024;
+const MAX_CONTACT_BODY_SIZE = 16 * 1024;
 const MAX_UPLOAD_SIZE = 2.5 * 1024 * 1024;
+const CONTACT_MIN_FORM_AGE_MS = 1500;
+const CONTACT_RETENTION_MS = 1000 * 60 * 60 * 24 * 183;
+const RESEND_EMAILS_URL = "https://api.resend.com/emails";
 const OPENAI_RESPONSES_URL =
   process.env.OPENAI_RESPONSES_URL?.trim() || "https://api.openai.com/v1/responses";
 const OPENAI_TRANSLATION_MODEL =
@@ -41,7 +46,6 @@ const publishSessions = new Map();
 const writeQueues = new Map();
 const researchRateLimits = new Map();
 const authRateLimits = new Map();
-const contactRateLimits = new Map();
 const translationSchema = {
   type: "object",
   additionalProperties: false,
@@ -195,6 +199,7 @@ async function ensureDataFiles() {
   await fs.mkdir(UPLOADS_DIR, { recursive: true });
   await ensureJsonFile(ARTICLES_FILE, []);
   await ensureJsonFile(MESSAGES_FILE, []);
+  await ensureJsonFile(CONTACT_RATE_FILE, []);
 }
 
 async function ensureJsonFile(filePath, fallback) {
@@ -271,8 +276,9 @@ function sendJson(res, statusCode, payload) {
 }
 
 function clientAddress(req) {
+  const trustProxy = process.env.CYRI_TRUST_PROXY?.trim().toLowerCase() === "true";
   return (
-    String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() ||
+    (trustProxy && String(req.headers["x-forwarded-for"] || "").split(",")[0].trim()) ||
     req.socket.remoteAddress ||
     "unknown"
   );
@@ -289,19 +295,52 @@ function enforceRateLimit(req, store, windowMs, maximum, message) {
   store.set(client, recent);
 }
 
+async function enforceContactRateLimit(req) {
+  const client = sha256(clientAddress(req));
+  const now = Date.now();
+  await serializeFileWrite(CONTACT_RATE_FILE, async () => {
+    const entries = await readJsonFile(CONTACT_RATE_FILE, []);
+    const nextEntries = [];
+    let clientTimestamps = [];
+
+    for (const entry of entries) {
+      const timestamps = Array.isArray(entry?.timestamps)
+        ? entry.timestamps.filter(
+            (timestamp) =>
+              Number.isFinite(timestamp) && now - timestamp < CONTACT_RATE_LIMIT_WINDOW_MS
+          )
+        : [];
+      if (timestamps.length === 0) continue;
+      if (entry?.client === client) {
+        clientTimestamps = timestamps;
+      } else if (typeof entry?.client === "string" && /^[a-f0-9]{64}$/i.test(entry.client)) {
+        nextEntries.push({ client: entry.client, timestamps });
+      }
+    }
+
+    if (clientTimestamps.length >= CONTACT_RATE_LIMIT_MAX) {
+      throw createError(429, "Too many contact messages. Try again later.");
+    }
+
+    clientTimestamps.push(now);
+    nextEntries.push({ client, timestamps: clientTimestamps });
+    await writeJsonFile(CONTACT_RATE_FILE, nextEntries);
+  });
+}
+
 function sendError(res, error) {
   const statusCode = error.statusCode || 500;
   const message = statusCode === 500 ? "Internal server error." : error.message;
   sendJson(res, statusCode, { error: message });
 }
 
-async function readRequestJson(req) {
+async function readRequestJson(req, maximumSize = MAX_JSON_BODY_SIZE) {
   let size = 0;
   let raw = "";
 
   for await (const chunk of req) {
     size += chunk.length;
-    if (size > MAX_JSON_BODY_SIZE) {
+    if (size > maximumSize) {
       throw createError(413, "Request body is too large.");
     }
     raw += chunk;
@@ -329,6 +368,10 @@ function cleanMultilineText(value, maxLength) {
     .replace(/\n{3,}/g, "\n\n")
     .trim();
   return text.slice(0, maxLength);
+}
+
+function withoutUnsafeControls(value) {
+  return String(value).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "");
 }
 
 function normalizeTranslationInput(input) {
@@ -798,12 +841,18 @@ async function saveUploadedImage(input) {
 }
 
 function normalizeMessage(input) {
-  const name = cleanText(input?.name, 120);
+  const name = withoutUnsafeControls(cleanText(input?.name, 120));
   const email = cleanEmail(input?.email);
-  const message = cleanMultilineText(input?.message, 5000);
+  const message = withoutUnsafeControls(cleanMultilineText(input?.message, 5000));
+  const startedAt = Number(input?.startedAt);
+  const now = Date.now();
 
-  if (!name || !message) {
-    throw createError(400, "Name and message are required.");
+  if (name.length < 2 || message.length < 10) {
+    throw createError(400, "Name and a message of at least 10 characters are required.");
+  }
+
+  if (!Number.isFinite(startedAt) || startedAt > now || now - startedAt < CONTACT_MIN_FORM_AGE_MS) {
+    throw createError(400, "Please take a moment to complete the contact form.");
   }
 
   return {
@@ -812,7 +861,157 @@ function normalizeMessage(input) {
     email,
     message,
     createdAt: new Date().toISOString(),
+    delivery: {
+      status: "pending",
+      provider: "resend",
+      updatedAt: new Date().toISOString(),
+    },
   };
+}
+
+function configuredEmailAddress(value, label, allowDisplayName = false) {
+  const text = String(value || "").trim();
+  if (!text || text.length > 320 || /[\r\n]/.test(text)) {
+    throw createError(503, `${label} is not configured correctly.`);
+  }
+
+  const plainMatch = text.match(/^([^\s<>@]+@[^\s<>@]+\.[^\s<>@]+)$/);
+  const namedMatch = allowDisplayName
+    ? text.match(/^[^<>\r\n]{1,100}<([^\s<>@]+@[^\s<>@]+\.[^\s<>@]+)>$/)
+    : null;
+  const address = plainMatch?.[1] || namedMatch?.[1] || "";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) {
+    throw createError(503, `${label} is not configured correctly.`);
+  }
+  return text;
+}
+
+function contactEmailConfig() {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  if (!apiKey || apiKey.length > 512 || /[\r\n]/.test(apiKey)) {
+    throw createError(503, "Contact email delivery is not configured.");
+  }
+
+  const apiUrl = process.env.RESEND_API_URL?.trim() || RESEND_EMAILS_URL;
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(apiUrl);
+  } catch {
+    throw createError(503, "Contact email delivery is not configured correctly.");
+  }
+  const isLocalTestUrl =
+    process.env.NODE_ENV === "test" &&
+    parsedUrl.protocol === "http:" &&
+    ["127.0.0.1", "localhost", "::1"].includes(parsedUrl.hostname);
+  if (parsedUrl.protocol !== "https:" && !isLocalTestUrl) {
+    throw createError(503, "Contact email delivery must use HTTPS.");
+  }
+
+  return {
+    apiKey,
+    apiUrl: parsedUrl.toString(),
+    from: configuredEmailAddress(
+      process.env.CYRI_CONTACT_FROM,
+      "Contact sender address",
+      true
+    ),
+    to: configuredEmailAddress(
+      process.env.CYRI_CONTACT_TO || "climateyri@gmail.com",
+      "Contact recipient address"
+    ),
+  };
+}
+
+function contactEmailText(message) {
+  return [
+    "New contact message from cyri.online",
+    "",
+    `Reference: ${message.id}`,
+    `Received: ${message.createdAt}`,
+    `Name: ${message.name}`,
+    `Email: ${message.email}`,
+    "",
+    "Message:",
+    message.message,
+    "",
+    "Reply to this email to answer the sender directly.",
+  ].join("\n");
+}
+
+async function sendContactEmail(message, config) {
+  let response;
+  try {
+    response = await fetch(config.apiUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${config.apiKey}`,
+        "Content-Type": "application/json",
+        "Idempotency-Key": `contact-${message.id}`,
+        "User-Agent": "CYRI-Website/1.0",
+      },
+      body: JSON.stringify({
+        from: config.from,
+        to: [config.to],
+        reply_to: message.email,
+        subject: "New contact message via cyri.online",
+        text: contactEmailText(message),
+        tags: [{ name: "source", value: "website-contact" }],
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
+  } catch {
+    throw createError(502, "Contact email delivery is temporarily unavailable.");
+  }
+
+  const payload = await response.json().catch(() => null);
+  if (!response.ok || typeof payload?.id !== "string" || !payload.id) {
+    console.error(`Contact email provider returned status ${response.status}.`);
+    throw createError(502, "Contact email delivery is temporarily unavailable.");
+  }
+
+  return payload.id;
+}
+
+function retainedContactMessages(messages, now = Date.now()) {
+  return messages.filter((message) => {
+    const createdAt = Date.parse(String(message?.createdAt || ""));
+    return !Number.isNaN(createdAt) && now - createdAt <= CONTACT_RETENTION_MS;
+  });
+}
+
+async function updateStoredMessageDelivery(id, delivery) {
+  await serializeFileWrite(MESSAGES_FILE, async () => {
+    const messages = await readJsonFile(MESSAGES_FILE, []);
+    const nextMessages = retainedContactMessages(messages).map((message) =>
+      message?.id === id ? { ...message, delivery } : message
+    );
+    await writeJsonFile(MESSAGES_FILE, nextMessages);
+  });
+}
+
+function enforceSameSiteRequest(req) {
+  const fetchSite = String(req.headers["sec-fetch-site"] || "").toLowerCase();
+  if (fetchSite && !["same-origin", "same-site", "none"].includes(fetchSite)) {
+    throw createError(403, "Cross-site requests are not allowed.");
+  }
+
+  const origin = String(req.headers.origin || "");
+  if (origin) {
+    let originHost;
+    try {
+      originHost = new URL(origin).host;
+    } catch {
+      throw createError(403, "Request origin is invalid.");
+    }
+    if (!originHost || originHost !== String(req.headers.host || "")) {
+      throw createError(403, "Cross-origin requests are not allowed.");
+    }
+  }
+
+  const contentType = String(req.headers["content-type"] || "").toLowerCase();
+  if (!contentType.startsWith("application/json")) {
+    throw createError(415, "Contact requests must use JSON.");
+  }
 }
 
 function sortArticlesByDate(articles) {
@@ -916,24 +1115,45 @@ async function handleApi(req, res, url) {
   }
 
   if (url.pathname === "/api/contact" && req.method === "POST") {
-    const body = await readRequestJson(req);
+    enforceSameSiteRequest(req);
+    const body = await readRequestJson(req, MAX_CONTACT_BODY_SIZE);
     if (cleanText(body.website, 200)) {
       sendJson(res, 201, { ok: true });
       return;
     }
-    enforceRateLimit(
-      req,
-      contactRateLimits,
-      CONTACT_RATE_LIMIT_WINDOW_MS,
-      CONTACT_RATE_LIMIT_MAX,
-      "Too many contact messages. Try again later."
-    );
-    const message = await serializeFileWrite(MESSAGES_FILE, async () => {
+    const emailConfig = contactEmailConfig();
+    await enforceContactRateLimit(req);
+    const message = normalizeMessage(body);
+    await serializeFileWrite(MESSAGES_FILE, async () => {
       const messages = await readJsonFile(MESSAGES_FILE, []);
-      const nextMessage = normalizeMessage(body);
-      await writeJsonFile(MESSAGES_FILE, [nextMessage, ...messages]);
-      return nextMessage;
+      await writeJsonFile(MESSAGES_FILE, [message, ...retainedContactMessages(messages)]);
     });
+
+    let emailId;
+    try {
+      emailId = await sendContactEmail(message, emailConfig);
+    } catch (error) {
+      try {
+        await updateStoredMessageDelivery(message.id, {
+          status: "failed",
+          provider: "resend",
+          updatedAt: new Date().toISOString(),
+        });
+      } catch {
+        console.error("Contact message delivery status could not be stored.");
+      }
+      throw error;
+    }
+    try {
+      await updateStoredMessageDelivery(message.id, {
+        status: "sent",
+        provider: "resend",
+        emailId,
+        updatedAt: new Date().toISOString(),
+      });
+    } catch {
+      console.error("Sent contact message delivery status could not be stored.");
+    }
     sendJson(res, 201, { ok: true });
     return;
   }

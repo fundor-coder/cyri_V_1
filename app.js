@@ -1687,11 +1687,13 @@ const photoSources = [
 const API_BASES = ["backend.php?route=", "api"];
 const PUBLISH_SESSION_KEY = "cyri-publish-token";
 const HOMEPAGE_ARTICLE_COUNT = 5;
+const HOMEPAGE_ARTICLE_ROTATION_MS = 12 * 1000;
 const FEATURED_ARTICLE_COUNT = 2;
 const SITE_FEATURES = {
   publishActionFunding: true,
 };
 let articleModalReturnFocus = null;
+let homepageArticleRotationTimer = null;
 
 const content = {
   en: {
@@ -1870,9 +1872,14 @@ const content = {
     },
     latest: {
       eyebrow: "New environmental info",
-      title: "Latest info articles",
-      intro: "New source-based CYRI info articles appear here automatically.",
+      title: "Articles in rotation",
+      intro: "The selection changes automatically so every CYRI info article is featured in turn.",
       viewAll: "View all info articles",
+      previous: "Previous article selection",
+      next: "Next article selection",
+      pause: "Pause rotation",
+      play: "Continue rotation",
+      status: "Rotation {current} of {total}",
     },
     learn: {
       topicsEyebrow: "Choose a topic",
@@ -2197,8 +2204,10 @@ const content = {
       messagePlaceholder: "Tell us what your message is about.",
       privacyNote: "We use your details only to answer your message. Details are in the privacy notice.",
       submit: "Send Message",
-      success: "Thank you. Your message has been saved and can be reviewed by the CYRI team.",
-      error: "The message could not be sent. Please try again later.",
+      success: "Thank you. Your message was securely sent to the CYRI team by email.",
+      error: "The message could not be delivered. Please email climateyri@gmail.com directly.",
+      rateLimited: "Too many messages were sent from this connection. Please try again later.",
+      unavailable: "Email delivery is currently unavailable. Please email climateyri@gmail.com directly.",
       panelEyebrow: "Contact",
       panelTitle: "Questions and article feedback.",
       panelText:
@@ -2297,13 +2306,13 @@ const content = {
         "This website sends contact messages and protected publishing requests to the CYRI backend.",
       localDataTitle: "Backend data",
       localDataText:
-        "Contact messages are stored on the server only to process the request and are normally deleted after six months unless legal obligations require longer storage.",
+        "Contact messages are sent to CYRI through the email delivery provider Resend and stored on the server for up to six months unless legal obligations require longer storage.",
       controllerTitle: "Controller and contact",
       controllerText:
         "CYRI, operated by Tobias Göppert and Jarne Bub, is responsible for this website. Privacy questions can be sent to climateyri@gmail.com.",
       processingTitle: "What is processed",
       processingText:
-        "The hosting provider may process technical log data. Contact forms process name, email address and message. The CYRI assistant sends the entered question to the configured AI provider only after consent.",
+        "The hosting provider and Resend may process technical and delivery data. Contact forms process name, email address and message. The CYRI assistant sends the entered question to the configured AI provider only after consent.",
       basisTitle: "Purposes and legal bases",
       basisText:
         "Technical logs are processed for secure website operation on the basis of legitimate interests under Article 6(1)(f) GDPR. Contact data is processed to answer the request under Article 6(1)(b) or (f) GDPR. AI questions are processed only with consent under Article 6(1)(a) GDPR, which can be withdrawn for the future.",
@@ -2505,9 +2514,15 @@ const content = {
     },
     latest: {
       eyebrow: "Neue Umweltinfos",
-      title: "Neueste Infoartikel",
-      intro: "Neue quellenbasierte CYRI-Infoartikel erscheinen hier automatisch.",
+      title: "Artikel im Wechsel",
+      intro:
+        "Die Auswahl wechselt automatisch, damit jeder CYRI-Infoartikel der Reihe nach vorgestellt wird.",
       viewAll: "Alle Infoartikel ansehen",
+      previous: "Vorherige Artikelauswahl",
+      next: "Nächste Artikelauswahl",
+      pause: "Rotation pausieren",
+      play: "Rotation fortsetzen",
+      status: "Rotation {current} von {total}",
     },
     learn: {
       topicsEyebrow: "Thema wählen",
@@ -2832,8 +2847,10 @@ const content = {
       messagePlaceholder: "Beschreibe, worum es in deiner Nachricht geht.",
       privacyNote: "Wir verwenden deine Angaben nur zur Beantwortung der Nachricht. Details stehen im Datenschutzhinweis.",
       submit: "Nachricht senden",
-      success: "Danke. Deine Nachricht wurde gespeichert und kann vom CYRI-Team geprüft werden.",
-      error: "Die Nachricht konnte nicht gesendet werden. Bitte versuche es später erneut.",
+      success: "Danke. Deine Nachricht wurde sicher per E-Mail an das CYRI-Team gesendet.",
+      error: "Die Nachricht konnte nicht zugestellt werden. Bitte schreibe direkt an climateyri@gmail.com.",
+      rateLimited: "Über diese Verbindung wurden zu viele Nachrichten gesendet. Bitte versuche es später erneut.",
+      unavailable: "Der E-Mail-Versand ist derzeit nicht verfügbar. Bitte schreibe direkt an climateyri@gmail.com.",
       panelEyebrow: "Kontakt",
       panelTitle: "Fragen und Artikelhinweise.",
       panelText:
@@ -2932,13 +2949,13 @@ const content = {
         "Diese Website sendet Kontaktanfragen und geschützte Veröffentlichungsanfragen an das CYRI-Backend.",
       localDataTitle: "Serverdaten",
       localDataText:
-        "Kontaktanfragen werden nur zur Bearbeitung auf dem Server gespeichert und normalerweise nach sechs Monaten gelöscht, sofern keine gesetzlichen Pflichten eine längere Speicherung erfordern.",
+        "Kontaktanfragen werden über den E-Mail-Versanddienst Resend an CYRI gesendet und bis zu sechs Monate auf dem Server gespeichert, sofern keine gesetzlichen Pflichten eine längere Speicherung erfordern.",
       controllerTitle: "Verantwortliche und Kontakt",
       controllerText:
         "Für diese Website ist CYRI, betrieben von Tobias Göppert und Jarne Bub, verantwortlich. Datenschutzfragen können an climateyri@gmail.com gesendet werden.",
       processingTitle: "Welche Daten verarbeitet werden",
       processingText:
-        "Der Hosting-Anbieter kann technische Protokolldaten verarbeiten. Das Kontaktformular verarbeitet Name, E-Mail-Adresse und Nachricht. Der CYRI-Assistent sendet die eingegebene Frage erst nach Einwilligung an den eingerichteten KI-Anbieter.",
+        "Der Hosting-Anbieter und Resend können technische Protokoll- und Zustelldaten verarbeiten. Das Kontaktformular verarbeitet Name, E-Mail-Adresse und Nachricht. Der CYRI-Assistent sendet die eingegebene Frage erst nach Einwilligung an den eingerichteten KI-Anbieter.",
       basisTitle: "Zwecke und Rechtsgrundlagen",
       basisText:
         "Technische Protokolldaten werden für den sicheren Websitebetrieb auf Grundlage berechtigter Interessen nach Art. 6 Abs. 1 lit. f DSGVO verarbeitet. Kontaktdaten werden zur Beantwortung nach Art. 6 Abs. 1 lit. b oder f DSGVO verarbeitet. KI-Fragen werden nur mit Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO verarbeitet; die Einwilligung kann für die Zukunft widerrufen werden.",
@@ -3122,6 +3139,8 @@ const state = {
   page: "home",
   anchor: null,
   filter: "all",
+  homepageArticleOffset: 0,
+  homepageArticlesPaused: false,
   activeArticleId: null,
   publisherToken: sessionStorage.getItem(PUBLISH_SESSION_KEY) || "",
   publisherUnlocked: Boolean(sessionStorage.getItem(PUBLISH_SESSION_KEY)),
@@ -5964,18 +5983,81 @@ function renderArticleCard(article, featured = false) {
   `;
 }
 
-function renderArticles() {
-  const sorted = sortedArticles();
-  const homepageArticles = sorted.slice(0, HOMEPAGE_ARTICLE_COUNT);
-  const newest = sorted.slice(0, FEATURED_ARTICLE_COUNT);
-  const older = sorted.slice(FEATURED_ARTICLE_COUNT);
+function homepageArticleSelection(sorted) {
+  if (sorted.length <= HOMEPAGE_ARTICLE_COUNT) return sorted;
+  const offset = state.homepageArticleOffset % sorted.length;
+  return Array.from(
+    { length: HOMEPAGE_ARTICLE_COUNT },
+    (_, index) => sorted[(offset + index) % sorted.length]
+  );
+}
+
+function renderHomepageArticles(sorted = sortedArticles()) {
   const homepageContainer = document.querySelector("[data-latest-articles]");
-  const newestContainer = document.querySelector("[data-articles-newest]");
-  const olderContainer = document.querySelector("[data-articles-older]");
+  const controls = document.querySelector("[data-article-rotation-controls]");
+  const status = document.querySelector("[data-article-rotation-status]");
+  const toggle = document.querySelector("[data-homepage-articles-toggle]");
+  const homepageArticles = homepageArticleSelection(sorted);
+  const canRotate = sorted.length > HOMEPAGE_ARTICLE_COUNT;
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   homepageContainer.innerHTML = homepageArticles.length
     ? homepageArticles.map((article) => renderArticleCard(article)).join("")
     : renderEmptyArticleState(t("articles.emptyLatest"), t("articles.emptyLatestHint"));
+
+  controls.hidden = !canRotate;
+  if (!canRotate) return;
+
+  const current = (state.homepageArticleOffset % sorted.length) + 1;
+  status.textContent = formatLearningText(t("latest.status"), {
+    current,
+    total: sorted.length,
+  });
+  toggle.hidden = reducedMotion;
+  toggle.textContent = t(state.homepageArticlesPaused ? "latest.play" : "latest.pause");
+  toggle.setAttribute("aria-pressed", String(state.homepageArticlesPaused));
+}
+
+function scheduleHomepageArticleRotation() {
+  window.clearTimeout(homepageArticleRotationTimer);
+  homepageArticleRotationTimer = null;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (state.homepageArticlesPaused || reducedMotion || state.page !== "home") return;
+  if (sortedArticles().length <= HOMEPAGE_ARTICLE_COUNT) return;
+
+  homepageArticleRotationTimer = window.setTimeout(() => {
+    const sorted = sortedArticles();
+    if (sorted.length > HOMEPAGE_ARTICLE_COUNT) {
+      state.homepageArticleOffset = (state.homepageArticleOffset + 1) % sorted.length;
+      renderHomepageArticles(sorted);
+    }
+    scheduleHomepageArticleRotation();
+  }, HOMEPAGE_ARTICLE_ROTATION_MS);
+}
+
+function moveHomepageArticleSelection(direction) {
+  const sorted = sortedArticles();
+  if (sorted.length <= HOMEPAGE_ARTICLE_COUNT) return;
+  state.homepageArticleOffset =
+    (state.homepageArticleOffset + direction + sorted.length) % sorted.length;
+  renderHomepageArticles(sorted);
+  scheduleHomepageArticleRotation();
+}
+
+function renderArticles() {
+  const sorted = sortedArticles();
+  const newest = sorted.slice(0, FEATURED_ARTICLE_COUNT);
+  const older = sorted.slice(FEATURED_ARTICLE_COUNT);
+  const newestContainer = document.querySelector("[data-articles-newest]");
+  const olderContainer = document.querySelector("[data-articles-older]");
+
+  if (sorted.length) {
+    state.homepageArticleOffset %= sorted.length;
+  } else {
+    state.homepageArticleOffset = 0;
+  }
+  renderHomepageArticles(sorted);
   newestContainer.innerHTML = newest.length
     ? newest.map((article) => renderArticleCard(article, true)).join("")
     : renderEmptyArticleState(t("articles.emptyNewest"), t("articles.emptyLatestHint"));
@@ -5986,6 +6068,8 @@ function renderArticles() {
   olderContainer.innerHTML = filteredOlder.length
     ? filteredOlder.map((article) => renderArticleCard(article)).join("")
     : `<p class="empty-state">${escapeHtml(t("articles.noResults"))}</p>`;
+
+  scheduleHomepageArticleRotation();
 }
 
 function renderFilters() {
@@ -6259,6 +6343,7 @@ function showPage(shouldScroll = true) {
 
   updateSeo();
   updateAudienceGate();
+  scheduleHomepageArticleRotation();
 
   if (!shouldScroll) return;
 
@@ -6995,6 +7080,19 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  const homepageArticleStep = event.target.closest("[data-homepage-articles-step]");
+  if (homepageArticleStep) {
+    moveHomepageArticleSelection(Number(homepageArticleStep.dataset.homepageArticlesStep));
+    return;
+  }
+
+  if (event.target.closest("[data-homepage-articles-toggle]")) {
+    state.homepageArticlesPaused = !state.homepageArticlesPaused;
+    renderHomepageArticles();
+    scheduleHomepageArticleRotation();
+    return;
+  }
+
   const articleButton = event.target.closest("[data-article-id]");
   if (articleButton) {
     openArticle(articleButton.dataset.articleId);
@@ -7196,7 +7294,16 @@ document.querySelector("[data-research-form]").addEventListener("submit", async 
   }
 });
 
-document.querySelector("[data-contact-form]").addEventListener("submit", async (event) => {
+const contactForm = document.querySelector("[data-contact-form]");
+const contactStartedAt = contactForm.querySelector("input[name='startedAt']");
+
+function resetContactFormTimer() {
+  contactStartedAt.value = String(Date.now());
+}
+
+resetContactFormTimer();
+
+contactForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const form = event.currentTarget;
   const submitButton = form.querySelector("button[type='submit']");
@@ -7205,6 +7312,7 @@ document.querySelector("[data-contact-form]").addEventListener("submit", async (
 
   submitButton.disabled = true;
   status.textContent = "";
+  status.dataset.state = "";
 
   try {
     await apiRequest("/contact", {
@@ -7213,12 +7321,22 @@ document.querySelector("[data-contact-form]").addEventListener("submit", async (
         name: String(data.get("name") || ""),
         email: String(data.get("email") || ""),
         message: String(data.get("message") || ""),
+        website: String(data.get("website") || ""),
+        startedAt: Number(data.get("startedAt") || 0),
       },
     });
     form.reset();
+    resetContactFormTimer();
     status.textContent = t("contact.success");
-  } catch {
-    status.textContent = t("contact.error");
+    status.dataset.state = "success";
+  } catch (error) {
+    status.textContent =
+      error.status === 429
+        ? t("contact.rateLimited")
+        : error.status === 503
+          ? t("contact.unavailable")
+          : t("contact.error");
+    status.dataset.state = "error";
   } finally {
     submitButton.disabled = false;
   }
@@ -7302,6 +7420,7 @@ document.querySelector("[data-publish-form]").addEventListener("submit", async (
 });
 
 window.addEventListener("hashchange", () => syncRoute(true));
+document.addEventListener("visibilitychange", scheduleHomepageArticleRotation);
 
 window.addEventListener("keydown", (event) => {
   const modal = document.querySelector("[data-article-modal]");
