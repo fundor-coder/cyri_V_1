@@ -5,6 +5,8 @@ const path = require("node:path");
 
 const PORT = Number(process.env.PORT || 5173);
 const PUBLIC_ROOT = __dirname;
+const ASSETS_ROOT = path.join(PUBLIC_ROOT, "assets");
+const CONTENT_ROOT = path.join(PUBLIC_ROOT, "content");
 const DATA_DIR = path.resolve(process.env.CYRI_DATA_DIR || path.join(__dirname, "data"));
 const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
 const ARTICLES_FILE = path.join(DATA_DIR, "articles.json");
@@ -231,6 +233,47 @@ const mimeTypes = {
   ".svg": "image/svg+xml",
   ".webp": "image/webp",
 };
+const PUBLIC_ROOT_FILES = new Set([
+  "/",
+  "/index.html",
+  "/app.js",
+  "/styles.css",
+  "/robots.txt",
+  "/site.webmanifest",
+]);
+const PUBLIC_CONTENT_PATHS = new Set([
+  "/content/articles.json",
+  "/content/articles-2026-expansion.json",
+]);
+const PUBLIC_ASSET_PATHS = new Set([
+  "/assets/action-funding-logo-rgb.jpg",
+  "/assets/action-funding-logo-rgb.webp",
+  "/assets/cyri-logo.svg",
+  "/assets/learning-3d.js",
+  "/assets/photos/aletsch-glacier-hd.jpg",
+  "/assets/photos/coral-bleaching-florida-2023-hd.jpg",
+  "/assets/photos/coral-reef-bleaching-hd.jpg",
+  "/assets/photos/coral-reef-bleaching-hd.webp",
+  "/assets/photos/mangrove-forest-hd.jpg",
+  "/assets/photos/ocean-plastic-hd.jpg",
+  "/assets/photos/offshore-wind-hd.jpg",
+  "/assets/photos/seagrass-meadow-zostera-hd.jpg",
+  "/assets/photos/sponge-city-rain-garden-hd.jpg",
+  "/assets/vendor/three/three.core.min.js",
+  "/assets/vendor/three/three.module.min.js",
+  ...Array.from(
+    { length: 17 },
+    (_, index) => `/assets/sdg/E_SDG_Icons-${String(index + 1).padStart(2, "0")}.jpg`
+  ),
+]);
+
+function isPublicStaticPath(requestPath) {
+  return (
+    PUBLIC_ROOT_FILES.has(requestPath) ||
+    PUBLIC_CONTENT_PATHS.has(requestPath) ||
+    PUBLIC_ASSET_PATHS.has(requestPath)
+  );
+}
 
 function createError(statusCode, message) {
   const error = new Error(message);
@@ -1585,7 +1628,19 @@ async function handleStatic(req, res, url) {
     throw createError(405, "Method not allowed.");
   }
 
-  const requestPath = decodeURIComponent(url.pathname);
+  let requestPath;
+  try {
+    requestPath = decodeURIComponent(url.pathname);
+  } catch {
+    throw createError(400, "Invalid URL.");
+  }
+  if (
+    requestPath.includes("\0") ||
+    requestPath.includes("\\") ||
+    path.posix.normalize(requestPath) !== requestPath
+  ) {
+    throw createError(404, "Not found.");
+  }
   if (requestPath === "/sitemap.xml") {
     const xml = await sitemapXml();
     res.writeHead(200, {
@@ -1625,30 +1680,45 @@ async function handleStatic(req, res, url) {
     return;
   }
 
-  const allowed =
-    requestPath === "/" ||
-    requestPath === "/index.html" ||
-    requestPath === "/app.js" ||
-    requestPath === "/styles.css" ||
-    requestPath === "/robots.txt" ||
-    requestPath === "/sitemap.xml" ||
-    requestPath === "/site.webmanifest" ||
-    requestPath.startsWith("/assets/") ||
-    requestPath.startsWith("/content/");
-
-  if (!allowed) {
+  if (!isPublicStaticPath(requestPath)) {
     throw createError(404, "Not found.");
   }
 
   const relativePath = requestPath === "/" ? "index.html" : requestPath.replace(/^\/+/, "");
   const filePath = path.resolve(PUBLIC_ROOT, relativePath);
-
   if (!filePath.startsWith(PUBLIC_ROOT + path.sep)) {
-    throw createError(403, "Forbidden.");
+    throw createError(404, "Not found.");
   }
 
-  const data = await fs.readFile(filePath);
-  const contentType = mimeTypes[path.extname(filePath).toLowerCase()] || "application/octet-stream";
+  const allowedRoot = requestPath.startsWith("/assets/")
+    ? ASSETS_ROOT
+    : requestPath.startsWith("/content/")
+      ? CONTENT_ROOT
+      : PUBLIC_ROOT;
+  let realFilePath;
+  let realAllowedRoot;
+  try {
+    [realFilePath, realAllowedRoot] = await Promise.all([
+      fs.realpath(filePath),
+      fs.realpath(allowedRoot),
+    ]);
+    const stats = await fs.stat(realFilePath);
+    if (!stats.isFile()) throw new Error("Static path is not a file.");
+  } catch {
+    throw createError(404, "Not found.");
+  }
+  if (
+    realFilePath !== realAllowedRoot &&
+    !realFilePath.startsWith(`${realAllowedRoot}${path.sep}`)
+  ) {
+    throw createError(404, "Not found.");
+  }
+
+  const data = await fs.readFile(realFilePath);
+  const contentType = mimeTypes[path.extname(realFilePath).toLowerCase()];
+  if (!contentType) {
+    throw createError(404, "Not found.");
+  }
   res.writeHead(200, {
     ...securityHeaders(),
     "Content-Type": contentType,
