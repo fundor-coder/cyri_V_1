@@ -155,6 +155,18 @@ test("clean localized URLs expose page and article SEO metadata", async ({ page 
 
   await articleModal.locator("[data-modal-close]").click();
   await expect(page).toHaveURL("http://127.0.0.1:5173/de/artikel");
+
+  await expect(page.locator('[data-page="articles"] .article-card')).toHaveCount(18);
+  await page.goto(
+    "http://127.0.0.1:5173/de/artikel/klimagerechtigkeit-kinderrechte-bildung-beteiligung-2026"
+  );
+  await expect(articleModal).toBeVisible();
+  await expect(articleModal.locator("[data-modal-title]")).toContainText(
+    "Klimagerechtigkeit und Kinderrechte"
+  );
+  await expect(articleModal.locator("[data-modal-body] h3")).toHaveCount(7);
+  await expect(articleModal.locator("[data-modal-source-list] li")).toHaveCount(5);
+  await articleModal.screenshot({ path: "/tmp/cyri-new-article.png" });
 });
 
 test("finale and certificate work on desktop", async ({ page }) => {
