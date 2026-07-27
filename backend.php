@@ -32,7 +32,10 @@ $sessionsFile = $dataDir . DIRECTORY_SEPARATOR . 'sessions.json';
 $researchRateFile = $dataDir . DIRECTORY_SEPARATOR . 'research-rate-limits.json';
 $loginRateFile = $dataDir . DIRECTORY_SEPARATOR . 'login-rate-limits.json';
 $contactRateFile = $dataDir . DIRECTORY_SEPARATOR . 'contact-rate-limits.json';
-$staticArticlesFile = __DIR__ . DIRECTORY_SEPARATOR . 'content' . DIRECTORY_SEPARATOR . 'articles.json';
+$staticArticlesFiles = [
+    __DIR__ . DIRECTORY_SEPARATOR . 'content' . DIRECTORY_SEPARATOR . 'articles.json',
+    __DIR__ . DIRECTORY_SEPARATOR . 'content' . DIRECTORY_SEPARATOR . 'articles-2026-expansion.json',
+];
 $allowedCategories = ['policy', 'energy', 'biodiversity', 'cities', 'marine'];
 $allowedImages = [
     'coral',
@@ -461,10 +464,13 @@ function score_research_article(array $article, string $question, array $terms):
     return $score;
 }
 
-function load_research_articles(string $articlesFile, string $staticArticlesFile): array
+function load_research_articles(string $articlesFile, array $staticArticlesFiles): array
 {
     $dynamic = array_values(array_filter(read_json_file($articlesFile), 'article_is_published'));
-    $static = parse_json_array($staticArticlesFile) ?? [];
+    $static = [];
+    foreach ($staticArticlesFiles as $staticArticlesFile) {
+        $static = array_merge($static, parse_json_array((string) $staticArticlesFile) ?? []);
+    }
     $unique = [];
 
     foreach (array_merge($dynamic, $static) as $article) {
@@ -598,7 +604,7 @@ function enforce_contact_rate_limit(string $rateFile): void
 function answer_research_with_openai(
     array $input,
     string $articlesFile,
-    string $staticArticlesFile,
+    array $staticArticlesFiles,
     string $rateFile
 ): array {
     $apiKey = getenv('OPENAI_API_KEY');
@@ -612,7 +618,7 @@ function answer_research_with_openai(
 
     $source = normalize_research_input($input);
     enforce_research_rate_limit($rateFile);
-    $availableArticles = load_research_articles($articlesFile, $staticArticlesFile);
+    $availableArticles = load_research_articles($articlesFile, $staticArticlesFiles);
     if (count($availableArticles) === 0) {
         fail(503, 'No published articles are available for research.');
     }
@@ -1348,7 +1354,7 @@ if ($route === '/research' && $method === 'POST') {
         answer_research_with_openai(
             read_request_json(),
             $articlesFile,
-            $staticArticlesFile,
+            $staticArticlesFiles,
             $researchRateFile
         )
     );

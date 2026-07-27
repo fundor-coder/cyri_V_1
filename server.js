@@ -10,7 +10,10 @@ const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
 const ARTICLES_FILE = path.join(DATA_DIR, "articles.json");
 const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
 const CONTACT_RATE_FILE = path.join(DATA_DIR, "contact-rate-limits.json");
-const STATIC_ARTICLES_FILE = path.join(PUBLIC_ROOT, "content", "articles.json");
+const STATIC_ARTICLE_FILES = [
+  path.join(PUBLIC_ROOT, "content", "articles.json"),
+  path.join(PUBLIC_ROOT, "content", "articles-2026-expansion.json"),
+];
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 12;
 const MAX_JSON_BODY_SIZE = 4 * 1024 * 1024;
 const MAX_CONTACT_BODY_SIZE = 16 * 1024;
@@ -656,12 +659,11 @@ function scoreResearchArticle(article, question, terms) {
 }
 
 async function loadResearchArticles() {
-  let staticArticles = [];
-  try {
-    staticArticles = await parseJsonArray(STATIC_ARTICLES_FILE);
-  } catch {
-    staticArticles = [];
-  }
+  const staticArticles = (
+    await Promise.all(
+      STATIC_ARTICLE_FILES.map((file) => parseJsonArray(file).catch(() => []))
+    )
+  ).flat();
 
   const dynamicArticles = (await readJsonFile(ARTICLES_FILE, [])).filter((article) =>
     isArticlePublished(article)
@@ -1167,10 +1169,11 @@ function articleRouteForPath(pathname) {
 }
 
 async function publicArticles() {
-  const [stored, builtIn] = await Promise.all([
+  const [stored, ...builtInCollections] = await Promise.all([
     readJsonFile(ARTICLES_FILE, []),
-    readJsonFile(STATIC_ARTICLES_FILE, []),
+    ...STATIC_ARTICLE_FILES.map((file) => readJsonFile(file, [])),
   ]);
+  const builtIn = builtInCollections.flat();
   const unique = new Map();
   [...stored, ...builtIn]
     .filter((article) => isArticlePublished(article))

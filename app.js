@@ -3884,10 +3884,19 @@ async function loadArticlesFromBackend() {
 
 async function loadStaticArticles() {
   try {
-    const response = await fetch("content/articles.json?v=20260608-3", { cache: "no-cache" });
-    if (!response.ok) throw new Error("Static article corpus is not available.");
-    const payload = await response.json();
-    articles.splice(0, articles.length, ...(Array.isArray(payload) ? payload : []));
+    const articleFiles = [
+      "content/articles.json?v=20260727-1",
+      "content/articles-2026-expansion.json?v=20260727-1",
+    ];
+    const payloads = await Promise.all(
+      articleFiles.map(async (url) => {
+        const response = await fetch(url, { cache: "no-cache" });
+        if (!response.ok) throw new Error("Static article corpus is not available.");
+        const payload = await response.json();
+        return Array.isArray(payload) ? payload : [];
+      })
+    );
+    articles.splice(0, articles.length, ...payloads.flat());
     renderArticles();
     if (state.activeArticleId) syncArticleModalToRoute();
     return true;

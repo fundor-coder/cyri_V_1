@@ -25,6 +25,9 @@ Student info experience:
 - The interactive world map uses clickable hotspots with scenario models for climate, biodiversity, water and justice contexts, including SDG references and Global South examples.
 - A local participation poll and action cards support low-threshold youth engagement without collecting personal data.
 - Articles remain the source-based foundation; infographics and social explainers are presented as additional information formats.
+- The built-in bilingual corpus contains 18 source-based articles. The original collection is in
+  `content/articles.json`; the ten-topic 2026 expansion is in
+  `content/articles-2026-expansion.json`.
 
 Backend routes:
 - `GET backend.php?route=/articles` returns published articles from `data/articles.json`.

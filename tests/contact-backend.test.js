@@ -58,6 +58,36 @@ async function contactRequest(baseUrl, body, extraHeaders = {}) {
   });
 }
 
+test("expanded article corpus is complete, bilingual and source-based", async () => {
+  const root = path.join(__dirname, "..", "content");
+  const [existing, expansion] = await Promise.all([
+    fs.readFile(path.join(root, "articles.json"), "utf8").then(JSON.parse),
+    fs
+      .readFile(path.join(root, "articles-2026-expansion.json"), "utf8")
+      .then(JSON.parse),
+  ]);
+  assert.equal(expansion.length, 10);
+  assert.equal(new Set([...existing, ...expansion].map((article) => article.id)).size, 18);
+
+  for (const article of expansion) {
+    assert.match(article.id, /^[a-z0-9-]+-2026$/);
+    assert.ok(["policy", "energy", "biodiversity", "cities", "marine"].includes(article.category));
+    assert.ok(article.title.de.length > 30);
+    assert.ok(article.title.en.length > 30);
+    assert.ok(article.summary.de.length > 140);
+    assert.ok(article.summary.en.length > 120);
+    assert.ok(article.body.de.length > 3000);
+    assert.ok(article.body.en.length > 3000);
+    assert.ok(article.children.body.de.length > 500);
+    assert.ok(article.children.body.en.length > 500);
+    assert.ok(article.sources.length >= 4);
+    article.sources.forEach((source) => {
+      assert.ok(source.label.length > 10);
+      assert.match(source.url, /^https:\/\//);
+    });
+  }
+});
+
 test("contact backend validates, stores and securely delivers messages", async (t) => {
   const providerRequests = [];
   const provider = http.createServer(async (req, res) => {
@@ -143,6 +173,14 @@ test("contact backend validates, stores and securely delivers messages", async (
     /https:\/\/cyri\.online\/en\/articles\/schwammstadt-regenwasser-hitze-2026/
   );
 
+  const expandedArticleResponse = await fetch(
+    `${baseUrl}/de/artikel/klimagerechtigkeit-kinderrechte-bildung-beteiligung-2026`
+  );
+  assert.equal(expandedArticleResponse.status, 200);
+  const expandedArticleHtml = await expandedArticleResponse.text();
+  assert.match(expandedArticleHtml, /Klimagerechtigkeit und Kinderrechte/);
+  assert.match(expandedArticleHtml, /"@type":"Article"/);
+
   const missingArticleResponse = await fetch(`${baseUrl}/de/artikel/nicht-vorhanden`);
   assert.equal(missingArticleResponse.status, 404);
 
@@ -153,6 +191,10 @@ test("contact backend validates, stores and securely delivers messages", async (
   assert.match(
     sitemap,
     /https:\/\/cyri\.online\/de\/artikel\/schwammstadt-regenwasser-hitze-2026/
+  );
+  assert.match(
+    sitemap,
+    /https:\/\/cyri\.online\/de\/artikel\/klimagerechtigkeit-kinderrechte-bildung-beteiligung-2026/
   );
   assert.doesNotMatch(sitemap, /\/de\/publizieren/);
 
