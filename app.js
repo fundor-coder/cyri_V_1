@@ -1133,9 +1133,24 @@ const learningGameTracks = [
 ];
 
 const certificateTiers = {
-  5: { id: "bronze", label: bi("Bronze", "Bronze"), rgb: "0.72 0.45 0.20", chip: "0.95 0.88 0.80" },
-  15: { id: "silver", label: bi("Silver", "Silber"), rgb: "0.44 0.48 0.52", chip: "0.91 0.93 0.95" },
-  30: { id: "gold", label: bi("Gold", "Gold"), rgb: "0.80 0.60 0.12", chip: "0.97 0.92 0.78" },
+  5: {
+    id: "bronze",
+    label: bi("Bronze", "Bronze"),
+    color: "#a76532",
+    light: "#f1dfcf",
+  },
+  15: {
+    id: "silver",
+    label: bi("Silver", "Silber"),
+    color: "#687782",
+    light: "#e7ecef",
+  },
+  30: {
+    id: "gold",
+    label: bi("Gold", "Gold"),
+    color: "#d19a18",
+    light: "#f7ebc8",
+  },
 };
 const certificateTierOrder = ["bronze", "silver", "gold"];
 
@@ -1710,7 +1725,7 @@ const content = {
         home: {
           title: "CYRI | Climate & Environmental Education for Teens",
           description:
-            "Interactive climate, ocean and nature education for teens and teachers: source-based articles, learning games and 3D models — free and youth-led.",
+            "Youth-led environmental education connecting climate, nature and the 17 Sustainable Development Goals through articles, learning games and interactive models.",
         },
         learn: {
           title: "Climate Learning Games for Teens | CYRI",
@@ -1816,9 +1831,9 @@ const content = {
     },
     hero: {
       eyebrow: "Youth-led environmental education",
-      title: "Understand the environment. Question it. Help shape it.",
+      title: "Environmental education that connects all 17 goals.",
       subtitle:
-        "We are building a digital youth platform for environmental education where young people publish clear articles, infographics and social media posts about climate, nature and environmental protection.",
+        "CYRI combines environmental education with the 17 Sustainable Development Goals. Young people explore how climate, nature, justice and sustainable development belong together.",
       primaryCta: "Start exploring",
       secondaryCta: "Read articles",
       imageAlt: "Bleached coral reef",
@@ -1846,6 +1861,28 @@ const content = {
           text: "Check facts with short quizzes and explanations.",
         },
       ],
+    },
+    homeSdgs: {
+      eyebrow: "Environmental education and Agenda 2030",
+      title: "Environmental knowledge connects all 17 Sustainable Development Goals.",
+      intro:
+        "CYRI shows how environmental questions are connected with education, health, food, energy, cities, justice and international cooperation.",
+      cta: "Explore the goals",
+      educationBadge: "SDG 4 · Quality Education",
+      educationTitle: "Environmental education builds knowledge for action.",
+      educationText:
+        "Clear information helps young people understand evidence, see connections and discuss fair solutions instead of treating environmental problems in isolation.",
+      educationPoints: [
+        "Understand reliable information",
+        "Connect ecology and society",
+        "Evaluate choices and solutions",
+      ],
+      allEyebrow: "The complete overview",
+      allTitle: "All 17 goals belong together.",
+      goalsAria: "All 17 Sustainable Development Goals",
+      actionText:
+        "In the learning section, you can test these connections through environmental challenges and the SDG Sprint.",
+      actionCta: "Start environmental learning",
     },
     mission: {
       eyebrow: "Mission",
@@ -2055,7 +2092,7 @@ const content = {
       certificateGoTo: "Enter name for certificate",
       certificateName: "Name on the certificate",
       certificateNameRequired: "Please enter a name for the certificate.",
-      certificateDownload: "Create certificate once",
+      certificateDownload: "Create certificate as PNG",
       certificateOnce: "Each tier (Bronze 5 min, Silver 15 min, Gold 30 min) can issue one certificate on this device.",
       certificateIssuedTitle: "Certificate issued",
       certificateIssuedText: "This tier already has its certificate. Complete a longer path to earn the next tier.",
@@ -2352,7 +2389,7 @@ const content = {
         home: {
           title: "CYRI | Umweltbildung für Jugendliche (Klima, Natur, Ozean)",
           description:
-            "Interaktive Umweltbildung zu Klima, Ozean und Natur für Jugendliche und Lehrkräfte: quellenbasierte Artikel, Lernspiele und 3D-Modelle – kostenlos und jugendgeführt.",
+            "Jugendgeführte Umweltbildung, die Klima, Natur und die 17 Nachhaltigkeitsziele mit Artikeln, Lernspielen und interaktiven Modellen verbindet.",
         },
         learn: {
           title: "Klima-Lernspiele für Jugendliche | CYRI",
@@ -2458,9 +2495,9 @@ const content = {
     },
     hero: {
       eyebrow: "Jugendgeführte Umweltbildung",
-      title: "Umwelt verstehen. Hinterfragen. Mitgestalten.",
+      title: "Umweltbildung, die alle 17 Ziele verbindet.",
       subtitle:
-        "Wir bauen eine digitale Jugendplattform für Umweltbildung auf, auf der junge Menschen verständliche Artikel, Infografiken und Social-Media-Beiträge zu Klima-, Natur- und Umweltschutz veröffentlichen.",
+        "CYRI verbindet Umweltbildung mit den 17 Nachhaltigkeitszielen. Junge Menschen entdecken, wie Klima, Natur, Gerechtigkeit und nachhaltige Entwicklung zusammengehören.",
       primaryCta: "Jetzt entdecken",
       secondaryCta: "Artikel lesen",
       imageAlt: "Gebleichter Korallenriffbereich",
@@ -2488,6 +2525,28 @@ const content = {
           text: "Checke Fakten mit kurzen Quizfragen und Erklärungen.",
         },
       ],
+    },
+    homeSdgs: {
+      eyebrow: "Umweltbildung und Agenda 2030",
+      title: "Umweltwissen verbindet alle 17 Nachhaltigkeitsziele.",
+      intro:
+        "CYRI zeigt, wie Umweltfragen mit Bildung, Gesundheit, Ernährung, Energie, Städten, Gerechtigkeit und internationaler Zusammenarbeit verbunden sind.",
+      cta: "Die Ziele entdecken",
+      educationBadge: "SDG 4 · Hochwertige Bildung",
+      educationTitle: "Umweltbildung schafft Wissen zum Handeln.",
+      educationText:
+        "Verständliche Informationen helfen jungen Menschen, Belege einzuordnen, Zusammenhänge zu erkennen und faire Lösungen zu diskutieren, statt Umweltprobleme einzeln zu betrachten.",
+      educationPoints: [
+        "Verlässliche Informationen verstehen",
+        "Ökologie und Gesellschaft verbinden",
+        "Entscheidungen und Lösungen bewerten",
+      ],
+      allEyebrow: "Die vollständige Übersicht",
+      allTitle: "Alle 17 Ziele gehören zusammen.",
+      goalsAria: "Alle 17 Nachhaltigkeitsziele",
+      actionText:
+        "Im Lernbereich testest du diese Zusammenhänge mit Umwelt-Challenges und dem SDG-Sprint.",
+      actionCta: "Umweltbildung starten",
     },
     mission: {
       eyebrow: "Mission",
@@ -2698,7 +2757,7 @@ const content = {
       certificateGoTo: "Namen für Zertifikat eintragen",
       certificateName: "Name auf dem Zertifikat",
       certificateNameRequired: "Bitte gib einen Namen für das Zertifikat ein.",
-      certificateDownload: "Zertifikat einmalig erstellen",
+      certificateDownload: "Zertifikat als PNG erstellen",
       certificateOnce: "Pro Stufe (Bronze 5 min, Silber 15 min, Gold 30 min) kann auf diesem Gerät ein Zertifikat ausgestellt werden.",
       certificateIssuedTitle: "Zertifikat ausgestellt",
       certificateIssuedText: "Diese Stufe hat ihr Zertifikat bereits. Schließe einen längeren Pfad ab, um die nächste Stufe zu verdienen.",
@@ -3039,12 +3098,28 @@ function loadGameProgress() {
 }
 
 function sanitizeCertificateEntry(entry) {
-  return entry &&
+  if (!(
+    entry &&
     typeof entry.id === "string" &&
     entry.id.startsWith("CYRI-") &&
     typeof entry.issuedAt === "string"
-    ? { id: entry.id.slice(0, 48), issuedAt: entry.issuedAt }
-    : null;
+  )) {
+    return null;
+  }
+
+  return {
+    id: entry.id.slice(0, 48),
+    issuedAt: entry.issuedAt,
+    ...(typeof entry.name === "string" ? { name: entry.name.slice(0, 80) } : {}),
+    ...(typeof entry.language === "string" && ["de", "en"].includes(entry.language)
+      ? { language: entry.language }
+      : {}),
+    ...(Number.isFinite(entry.minutes) ? { minutes: entry.minutes } : {}),
+    ...(Number.isFinite(entry.missionCount) ? { missionCount: entry.missionCount } : {}),
+    ...(Array.isArray(entry.sdgs)
+      ? { sdgs: entry.sdgs.filter((number) => Number.isInteger(number) && number >= 1 && number <= 17) }
+      : {}),
+  };
 }
 
 function loadCertificateIssuance() {
@@ -4037,6 +4112,39 @@ function renderLearningPaths() {
           <span class="learning-step">${escapeHtml(path.step)}</span>
           <h3>${escapeHtml(path.title)}</h3>
           <p>${escapeHtml(path.text)}</p>
+        </article>
+      `
+    )
+    .join("");
+}
+
+function renderHomepageSdgs() {
+  const education = document.querySelector("[data-home-sdg-education]");
+  const goals = document.querySelector("[data-home-sdg-goals]");
+  if (!education || !goals) return;
+
+  education.style.setProperty("--sdg-color", getSdgGoal(4).color);
+  education.innerHTML = `
+    <span class="home-sdg-education-badge">${escapeHtml(t("homeSdgs.educationBadge"))}</span>
+    <h3>${escapeHtml(t("homeSdgs.educationTitle"))}</h3>
+    <p>${escapeHtml(t("homeSdgs.educationText"))}</p>
+    <ul>
+      ${t("homeSdgs.educationPoints")
+        .map((point) => `<li>${escapeHtml(point)}</li>`)
+        .join("")}
+    </ul>
+  `;
+
+  goals.innerHTML = sdgGoals
+    .map(
+      (goal) => `
+        <article
+          class="home-sdg-goal${goal.number === 4 ? " is-education" : ""}"
+          role="listitem"
+          style="--sdg-color: ${goal.color}; --sdg-ink: ${contrastText(goal.color)}"
+        >
+          <span>${goal.number}</span>
+          <strong>${escapeHtml(localizedValue(goal.title))}</strong>
         </article>
       `
     )
@@ -5225,128 +5333,284 @@ function celebrationCertificateTier() {
   return pathComplete && !state.certificateIssuance?.[tier.id] ? tier : null;
 }
 
-function pdfSafeText(value) {
-  const replacements = {
-    "–": "-",
-    "—": "-",
-    "‘": "'",
-    "’": "'",
-    "“": '"',
-    "”": '"',
+const certificateTierSdgs = {
+  bronze: [4, 11, 12, 13, 14, 17],
+  silver: [4, 6, 11, 12, 13, 14, 15, 17],
+  gold: [4, 6, 7, 10, 11, 12, 13, 14, 15, 17],
+};
+
+function certificateRoundedRect(context, x, y, width, height, radius) {
+  const safeRadius = Math.min(radius, width / 2, height / 2);
+  context.beginPath();
+  context.moveTo(x + safeRadius, y);
+  context.arcTo(x + width, y, x + width, y + height, safeRadius);
+  context.arcTo(x + width, y + height, x, y + height, safeRadius);
+  context.arcTo(x, y + height, x, y, safeRadius);
+  context.arcTo(x, y, x + width, y, safeRadius);
+  context.closePath();
+}
+
+function certificateFitFont(context, text, maximumWidth, maximumSize, minimumSize, weight = 700) {
+  let size = maximumSize;
+  while (size > minimumSize) {
+    context.font = `${weight} ${size}px Arial, sans-serif`;
+    if (context.measureText(text).width <= maximumWidth) break;
+    size -= 2;
+  }
+  return size;
+}
+
+function certificateWrappedLines(context, text, maximumWidth, maximumLines = 2) {
+  const words = String(text).trim().split(/\s+/).filter(Boolean);
+  const lines = [];
+  let line = "";
+
+  words.forEach((word) => {
+    const candidate = line ? `${line} ${word}` : word;
+    if (!line || context.measureText(candidate).width <= maximumWidth) {
+      line = candidate;
+      return;
+    }
+    lines.push(line);
+    line = word;
+  });
+  if (line) lines.push(line);
+
+  if (lines.length <= maximumLines) return lines;
+  const visible = lines.slice(0, maximumLines);
+  let finalLine = lines.slice(maximumLines - 1).join(" ");
+  while (context.measureText(`${finalLine}…`).width > maximumWidth && finalLine.includes(" ")) {
+    finalLine = finalLine.slice(0, finalLine.lastIndexOf(" "));
+  }
+  visible[maximumLines - 1] = `${finalLine}…`;
+  return visible;
+}
+
+function drawCertificateLines(context, lines, x, y, lineHeight) {
+  lines.forEach((line, index) => context.fillText(line, x, y + index * lineHeight));
+}
+
+function certificateCopy(tier, minutes, track, issuedAt) {
+  const german = state.lang === "de";
+  const tierLabel = localizedValue(tier.label);
+  const missionNames = track.games.map((id) =>
+    localizedValue(learningGames.find((game) => game.id === id)?.title || id)
+  );
+  return {
+    title: german ? "CYRI Klima-Zertifikat" : "CYRI Climate Certificate",
+    missionLabel: german ? "MISSION GESCHAFFT" : "MISSION COMPLETE",
+    recipientLabel: german ? "AUSGESTELLT FÜR" : "AWARDED TO",
+    statement: german
+      ? `hat den CYRI-Klimamissionspfad der ${tierLabel}-Stufe erfolgreich abgeschlossen.`
+      : `has successfully completed the CYRI climate mission path at ${tierLabel} level.`,
+    missionNames,
+    timeLabel: german ? "MISSIONSZEIT" : "MISSION TIME",
+    missionValue: german ? `${minutes} MINUTEN` : `${minutes} MINUTES`,
+    modulesLabel: german ? "MISSIONEN" : "MISSIONS",
+    issuedLabel: german ? "Ausgestellt" : "Issued",
+    idLabel: german ? "Zertifikats-ID" : "Certificate ID",
+    sdgLabel: german ? "SDG-Fokus" : "SDG focus",
+    sealLabel: german ? "SDG-ZIELE" : "SDG GOALS",
+    funding: german
+      ? "Gefördert durch die DSEE mit Mitteln des BMZ – action! Aktiv für eine globale Welt"
+      : "Funded by DSEE with funds from BMZ – action! Aktiv für eine globale Welt",
+    date: new Intl.DateTimeFormat(german ? "de-DE" : "en-GB", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    }).format(issuedAt),
   };
-  return Array.from(String(value).trim())
-    .map((character) => {
-      const normalized = replacements[character] || character;
-      const code = normalized.charCodeAt(0);
-      if (normalized === "\\" || normalized === "(" || normalized === ")") {
-        return `\\${normalized}`;
-      }
-      if (code >= 32 && code <= 126) return normalized;
-      if (code >= 160 && code <= 255) return `\\${code.toString(8).padStart(3, "0")}`;
-      return normalized
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^\x20-\x7e]/g, " ");
-    })
-    .join("");
+}
+
+function drawClimateCertificate(canvas, details) {
+  const context = canvas.getContext("2d");
+  const {
+    name,
+    tier,
+    minutes,
+    track,
+    certificateId,
+    issuedAt,
+    sdgs,
+  } = details;
+  const copy = certificateCopy(tier, minutes, track, issuedAt);
+  const dark = "#062f27";
+  const green = "#075f4d";
+  const paper = "#f6f9f1";
+  const soft = "#e8f1e9";
+  const muted = "#52645e";
+
+  context.fillStyle = dark;
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = paper;
+  context.fillRect(54, 54, 1892, 1306);
+  context.strokeStyle = dark;
+  context.lineWidth = 4;
+  context.strokeRect(94, 94, 1812, 1226);
+
+  const stripeColors = ["#4f9f5b", "#2f91ad", "#f4bc3b", "#dc5145", "#9255a5"];
+  stripeColors.forEach((color, index) => {
+    context.fillStyle = color;
+    context.fillRect(94 + index * 362.4, 121, 362.4, 24);
+  });
+
+  context.fillStyle = green;
+  context.font = "800 62px Arial, sans-serif";
+  context.fillText("CYRI", 130, 222);
+  context.fillStyle = "#3e5650";
+  context.font = "600 20px Arial, sans-serif";
+  context.fillText("CLIMATE YOUTH RESEARCH INITIATIVE", 320, 215);
+
+  context.fillStyle = "#dceee4";
+  certificateRoundedRect(context, 130, 252, 435, 69, 3);
+  context.fill();
+  context.fillStyle = green;
+  context.font = "800 24px Arial, sans-serif";
+  context.textAlign = "center";
+  context.fillText(copy.missionLabel, 347, 295);
+
+  context.fillStyle = tier.light;
+  certificateRoundedRect(context, 587, 252, 267, 69, 3);
+  context.fill();
+  context.strokeStyle = tier.color;
+  context.lineWidth = 3;
+  context.stroke();
+  context.fillStyle = tier.color;
+  context.font = "800 24px Arial, sans-serif";
+  context.fillText(localizedValue(tier.label).toUpperCase(), 720, 295);
+  context.textAlign = "left";
+
+  context.fillStyle = "#0b201c";
+  context.font = "800 61px Arial, sans-serif";
+  context.fillText(copy.title, 130, 415);
+  context.fillStyle = muted;
+  context.font = "700 19px Arial, sans-serif";
+  context.fillText(copy.recipientLabel, 132, 458);
+
+  context.fillStyle = green;
+  const nameFontSize = certificateFitFont(context, name, 1090, 70, 38, 800);
+  context.font = `800 ${nameFontSize}px Arial, sans-serif`;
+  context.fillText(name, 130, 525);
+
+  context.fillStyle = "#213b34";
+  context.font = "400 28px Arial, sans-serif";
+  drawCertificateLines(
+    context,
+    certificateWrappedLines(context, copy.statement, 1110, 2),
+    130,
+    575,
+    36
+  );
+
+  context.strokeStyle = green;
+  context.lineWidth = 3;
+  context.beginPath();
+  context.moveTo(134, 658);
+  context.lineTo(1320, 658);
+  context.stroke();
+
+  context.fillStyle = "#40554f";
+  context.font = "500 23px Arial, sans-serif";
+  const missionLines = certificateWrappedLines(
+    context,
+    copy.missionNames.join("  |  "),
+    1120,
+    2
+  );
+  drawCertificateLines(context, missionLines, 134, 750, 34);
+
+  context.fillStyle = soft;
+  certificateRoundedRect(context, 130, 845, 548, 150, 3);
+  context.fill();
+  certificateRoundedRect(context, 700, 845, 548, 150, 3);
+  context.fill();
+  context.fillStyle = "#3f5650";
+  context.font = "800 18px Arial, sans-serif";
+  context.fillText(copy.timeLabel, 160, 888);
+  context.fillText(copy.modulesLabel, 730, 888);
+  context.fillStyle = green;
+  context.font = "800 43px Arial, sans-serif";
+  context.fillText(copy.missionValue, 160, 952);
+  context.fillText(`${track.games.length} / ${track.games.length}`, 730, 952);
+
+  context.save();
+  context.translate(1530, 745);
+  context.fillStyle = tier.color;
+  context.beginPath();
+  context.arc(-80, 0, 168, 0, Math.PI * 2);
+  context.arc(80, 0, 168, 0, Math.PI * 2);
+  context.fill();
+  context.strokeStyle = green;
+  context.lineWidth = 8;
+  context.beginPath();
+  context.arc(0, 0, 172, 0, Math.PI * 2);
+  context.stroke();
+  context.fillStyle = green;
+  context.textAlign = "center";
+  context.font = "800 74px Arial, sans-serif";
+  context.fillText("17", 0, -15);
+  context.font = "800 18px Arial, sans-serif";
+  context.fillText(copy.sealLabel, 0, 65);
+  context.restore();
+
+  context.fillStyle = "#344b44";
+  context.font = "500 21px Arial, sans-serif";
+  context.fillText(`${copy.sdgLabel}: ${sdgs.join(" | ")}`, 134, 1065);
+  context.fillText(`${copy.issuedLabel}: ${copy.date}`, 134, 1115);
+  context.font = "500 18px Arial, sans-serif";
+  context.fillText(`${copy.idLabel}: ${certificateId}`, 134, 1163);
+
+  context.fillStyle = green;
+  context.font = "800 59px Arial, sans-serif";
+  context.textAlign = "right";
+  context.fillText("CYRI.ONLINE", 1780, 1190);
+  context.textAlign = "left";
+
+  context.fillStyle = muted;
+  const fundingFontSize = certificateFitFont(context, copy.funding, 1160, 18, 14, 500);
+  context.font = `500 ${fundingFontSize}px Arial, sans-serif`;
+  context.fillText(copy.funding, 134, 1250);
 }
 
 function downloadClimateCertificate(name, tier, minutes = certificateMinutesForTier(tier.id)) {
   const issuedAt = new Date();
-  const tierName = pdfSafeText(localizedValue(tier.label).toUpperCase());
-  const certificateId = `CYRI-${tier.id.toUpperCase()}-${issuedAt.toISOString().slice(0, 10).replace(/-/g, "")}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
-  const recipient = pdfSafeText(name);
-  const recipientFontSize = Math.max(15, Math.min(30, Math.floor(1050 / Math.max(name.length, 1))));
-  const date = pdfSafeText(
-    new Intl.DateTimeFormat(state.lang === "de" ? "de-DE" : "en-GB", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    }).format(issuedAt)
-  );
+  const certificateId = `CYRI-${tier.id.toUpperCase()}-${issuedAt
+    .toISOString()
+    .slice(0, 10)
+    .replace(/-/g, "")}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
   const track = learningGameTracks.find((item) => item.minutes === minutes) || learningGameTracks[0];
-  const certificateText = pdfSafeText(
-    state.lang === "de"
-      ? `hat die CYRI-Klimamissionen der ${minutes}-Minuten-Stufe erfolgreich abgeschlossen.`
-      : `has successfully completed the CYRI climate missions of the ${minutes}-minute path.`
-  );
-  const issuedLabel = pdfSafeText(state.lang === "de" ? "Ausgestellt" : "Issued");
-  const missionLabel = pdfSafeText(state.lang === "de" ? "MISSION GESCHAFFT" : "MISSION COMPLETE");
-  const timeLabel = pdfSafeText(state.lang === "de" ? "MISSIONZEIT" : "MISSION TIME");
-  const modulesLabel = pdfSafeText(state.lang === "de" ? "MISSIONEN" : "MISSIONS");
-  const fundingText = pdfSafeText(
-    "Funded by DSEE with funds from BMZ - action! Aktiv für eine globale Welt"
-  );
-  const completionValue = `${track.games.length} / ${track.games.length}`;
-  const missionNames = pdfSafeText(
-    track.games
-      .map((id) => localizedValue(learningGames.find((game) => game.id === id)?.title || id))
-      .join("  |  ")
-  );
-  const contentStream = [
-    "0.035 0.16 0.14 rg 0 0 842 595 re f",
-    "0.965 0.98 0.95 rg 24 24 794 547 re f",
-    "0.035 0.16 0.14 RG 1.6 w 42 42 758 511 re S",
-    "0.30 0.62 0.35 rg 42 531 150 10 re f",
-    "0.16 0.55 0.69 rg 192 531 150 10 re f",
-    "0.95 0.73 0.23 rg 342 531 150 10 re f",
-    "0.88 0.32 0.27 rg 492 531 150 10 re f",
-    "0.57 0.33 0.65 rg 642 531 150 10 re f",
-    "0.88 0.95 0.90 rg 58 452 194 30 re f",
-    `BT /F2 10 Tf 0.03 0.32 0.25 rg 72 462 Td (${missionLabel}) Tj ET`,
-    `${tier.chip} rg 262 452 118 30 re f`,
-    `${tier.rgb} RG 1.2 w 262 452 118 30 re S`,
-    `BT /F2 10 Tf ${tier.rgb} rg 278 462 Td (${tierName}) Tj ET`,
-    "BT /F2 22 Tf 0.03 0.32 0.25 rg 60 502 Td (CYRI) Tj ET",
-    "BT /F1 8 Tf 0.14 0.25 0.22 rg 125 506 Td (CLIMATE YOUTH RESEARCH INITIATIVE) Tj ET",
-    "BT /F2 35 Tf 0.05 0.12 0.11 rg 58 398 Td (Climate Certificate) Tj ET",
-    "BT /F1 12 Tf 0.30 0.36 0.33 rg 60 371 Td (AWARDED TO) Tj ET",
-    `BT /F2 ${recipientFontSize} Tf 0.03 0.32 0.25 rg 60 324 Td (${recipient}) Tj ET`,
-    "0.03 0.32 0.25 RG 1.2 w 60 305 m 610 305 l S",
-    `BT /F1 12 Tf 0.12 0.20 0.18 rg 60 273 Td (${certificateText}) Tj ET`,
-    `BT /F1 10 Tf 0.22 0.30 0.27 rg 60 245 Td (${missionNames}) Tj ET`,
-    "0.91 0.95 0.91 rg 58 150 244 66 re f",
-    "0.91 0.95 0.91 rg 312 150 244 66 re f",
-    `BT /F2 8 Tf 0.22 0.34 0.29 rg 72 195 Td (${timeLabel}) Tj ET`,
-    `BT /F2 20 Tf 0.03 0.32 0.25 rg 72 168 Td (${minutes} MIN) Tj ET`,
-    `BT /F2 8 Tf 0.22 0.34 0.29 rg 326 195 Td (${modulesLabel}) Tj ET`,
-    `BT /F2 20 Tf 0.03 0.32 0.25 rg 326 168 Td (${completionValue}) Tj ET`,
-    `${tier.rgb} rg 676 326 m 729 357 782 326 782 265 c 782 204 729 173 676 204 c 623 173 570 204 570 265 c 570 326 623 357 676 326 c f`,
-    "0.03 0.32 0.25 RG 4 w 589 265 m 589 313 628 340 676 340 c 724 340 763 313 763 265 c 763 217 724 190 676 190 c 628 190 589 217 589 265 c S",
-    "BT /F2 34 Tf 0.03 0.32 0.25 rg 645 266 Td (17) Tj ET",
-    "BT /F2 9 Tf 0.03 0.32 0.25 rg 633 244 Td (SDG GOALS) Tj ET",
-    "BT /F1 9 Tf 0.20 0.28 0.25 rg 60 117 Td (SDG focus: 6 | 11 | 12 | 13 | 14 | 15 | 17) Tj ET",
-    `BT /F1 9 Tf 0.20 0.28 0.25 rg 60 96 Td (${issuedLabel}: ${date}) Tj ET`,
-    `BT /F1 8 Tf 0.30 0.36 0.33 rg 60 76 Td (Certificate ID: ${certificateId}) Tj ET`,
-    "BT /F2 10 Tf 0.03 0.32 0.25 rg 618 117 Td (CYRI.ONLINE) Tj ET",
-    `BT /F1 7 Tf 0.30 0.36 0.33 rg 60 53 Td (${fundingText}) Tj ET`,
-  ].join("\n");
-  const objects = [
-    "1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n",
-    "2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n",
-    "3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >> endobj\n",
-    "4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> endobj\n",
-    "5 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >> endobj\n",
-    `6 0 obj << /Length ${contentStream.length} >> stream\n${contentStream}\nendstream\nendobj\n`,
-  ];
-  let pdf = "%PDF-1.4\n";
-  const offsets = [0];
-  objects.forEach((object) => {
-    offsets.push(pdf.length);
-    pdf += object;
+  const sdgs = certificateTierSdgs[tier.id] || certificateTierSdgs.gold;
+  const canvas = document.createElement("canvas");
+  canvas.width = 2000;
+  canvas.height = 1414;
+  drawClimateCertificate(canvas, {
+    name,
+    tier,
+    minutes,
+    track,
+    certificateId,
+    issuedAt,
+    sdgs,
   });
-  const xrefOffset = pdf.length;
-  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
-  offsets.slice(1).forEach((offset) => {
-    pdf += `${String(offset).padStart(10, "0")} 00000 n \n`;
-  });
-  pdf += `trailer << /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(new Blob([pdf], { type: "application/pdf" }));
-  link.download = `CYRI-Climate-Certificate-${certificateId.slice(5)}.pdf`;
-  link.click();
-  window.setTimeout(() => URL.revokeObjectURL(link.href), 1000);
-  return { id: certificateId, issuedAt: issuedAt.toISOString() };
+
+  canvas.toBlob((blob) => {
+    if (!blob) return;
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `CYRI-Climate-Certificate-${certificateId.slice(5)}.png`;
+    link.click();
+    window.setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  }, "image/png");
+
+  return {
+    id: certificateId,
+    issuedAt: issuedAt.toISOString(),
+    name,
+    language: state.lang,
+    minutes,
+    missionCount: track.games.length,
+    sdgs,
+  };
 }
 
 let learningModelDispose = null;
@@ -6296,6 +6560,7 @@ async function uploadCustomImage(file, credit) {
 function renderDynamicContent() {
   renderMissionFocus();
   renderLearningPaths();
+  renderHomepageSdgs();
   renderMissionLab();
   renderSdgLab();
   renderLearningGames();
