@@ -26,8 +26,8 @@
     <link rel="manifest" href="site.webmanifest" />
     <link rel="icon" href="assets/cyri-logo.svg" type="image/svg+xml" />
     <link rel="preload" href="assets/photos/coral-reef-bleaching-hd.webp" as="image" type="image/webp" fetchpriority="high" />
-    <link rel="stylesheet" href="styles.css?v=20260727-6" />
-    <script src="app.js?v=20260727-6" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260727-7" />
+    <script src="app.js?v=20260727-7" defer></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -174,7 +174,7 @@
                 </div>
                 <div
                   class="home-sdg-goals"
-                  role="list"
+                  role="group"
                   data-home-sdg-goals
                   data-i18n-aria="homeSdgs.goalsAria"
                   aria-label="All 17 Sustainable Development Goals"
@@ -916,6 +916,52 @@
           This choice is saved on this device.
         </small>
       </section>
+    </div>
+
+    <div class="article-modal home-sdg-modal" data-home-sdg-modal hidden aria-hidden="true">
+      <article
+        class="modal-panel home-sdg-modal-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="home-sdg-modal-title"
+        data-home-sdg-modal-panel
+      >
+        <button
+          class="modal-close"
+          type="button"
+          data-home-sdg-modal-close
+          data-i18n-aria="accessibility.close"
+        >×</button>
+        <div class="home-sdg-modal-layout">
+          <figure class="home-sdg-modal-logo">
+            <img src="" alt="" data-home-sdg-modal-image />
+          </figure>
+          <div class="home-sdg-modal-copy">
+            <p class="eyebrow" data-home-sdg-modal-eyebrow></p>
+            <h2 id="home-sdg-modal-title" data-home-sdg-modal-title></h2>
+            <p class="home-sdg-modal-short" data-home-sdg-modal-short></p>
+            <div class="home-sdg-modal-info">
+              <section>
+                <strong data-home-sdg-modal-focus-label></strong>
+                <p data-home-sdg-modal-focus></p>
+              </section>
+              <section>
+                <strong data-home-sdg-modal-question-label></strong>
+                <p data-home-sdg-modal-question></p>
+              </section>
+            </div>
+          </div>
+        </div>
+        <footer class="home-sdg-modal-source">
+          <a
+            href="https://sdgs.un.org/goals"
+            target="_blank"
+            rel="noreferrer"
+            data-home-sdg-modal-link
+          ></a>
+          <small data-home-sdg-modal-note></small>
+        </footer>
+      </article>
     </div>
 
     <div class="article-modal" data-article-modal hidden aria-hidden="true">

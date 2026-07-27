@@ -98,6 +98,11 @@ For production, set `CYRI_PUBLISH_PASSWORD` or `CYRI_PUBLISH_PASSWORD_HASH` in t
 Third-party frontend code:
 - Three.js `0.185.1` is vendored in `assets/vendor/three` under the MIT License. The original license text is included beside the module.
 
+SDG icon assets:
+- The individual icons in `assets/sdg/` are official United Nations communications materials
+  sourced from [sdgs.un.org/goals](https://sdgs.un.org/goals).
+- CYRI's accompanying explanations are independent and are not endorsed by the United Nations.
+
 Photo sources:
 - `assets/photos/sponge-city-rain-garden-hd.jpg`: Jeremy Jeziorski / Oregon Convention Center via Wikimedia Commons, CC BY 2.0; resized for web delivery.
 - `assets/photos/seagrass-meadow-zostera-hd.jpg`: Olivier Dugornay / Ifremer via Wikimedia Commons, CC BY 4.0; resized for web delivery.
