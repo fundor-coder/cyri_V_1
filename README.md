@@ -47,6 +47,17 @@ Deployment:
 - Static-only hosting is not enough for publishing, contact messages or AI answers, because those features need the backend.
 - GitHub Pages can display the frontend, but it cannot run the CYRI assistant or store published articles. Use the Node/Docker or PHP deployment as the production website when these functions must work.
 
+Private-file protection:
+- The Node server uses a strict public-file allowlist. It serves only the required root frontend
+  files, approved image/script formats below `assets/`, the two public article corpora and
+  generated public article routes.
+- PDF, Office, archive, database, key, backup, log, temporary, source-map and internal project
+  files are never served as static files. Unknown or blocked paths return the same `404` response.
+- Apache applies matching deny rules through `.htaccess`. The Docker build context excludes
+  private documents, local environment files, internal notes, tests and funding-application files.
+- Keep secrets and personal documents outside the deployment directory as an additional boundary;
+  do not rely on a filename being difficult to guess.
+
 Google search setup:
 - German and English content uses clean, crawlable URLs such as `/de/lernen`,
   `/en/learn` and one URL per published article. Legacy hash links are upgraded in the browser.

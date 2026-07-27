@@ -7,17 +7,26 @@ Options -Indexes
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+  # Default-deny internal folders, dotfiles and document/archive/database formats.
+  RewriteRule ^(?:Antrag|data|tests|test-results|node_modules|\.git|\.claude)(?:/|$) - [R=404,L,NC]
+  RewriteRule (^|/)\.(?!well-known(?:/|$)) - [R=404,L,NC]
+  RewriteRule \.(?:pdf|docx?|xlsx?|pptx?|odt|ods|odp|rtf|csv|zip|tar|gz|tgz|7z|rar|key|pem|p12|pfx|sqlite3?|db|log|bak|tmp|map)(?:/|$) - [R=404,L,NC]
+  RewriteRule ^content/(?!articles(?:-2026-expansion)?\.json$) - [R=404,L,NC]
+  RewriteCond %{REQUEST_URI} !^/assets/(?:action-funding-logo-rgb\.(?:jpg|webp)|cyri-logo\.svg|learning-3d\.js|photos/(?:aletsch-glacier-hd\.jpg|coral-bleaching-florida-2023-hd\.jpg|coral-reef-bleaching-hd\.(?:jpg|webp)|mangrove-forest-hd\.jpg|ocean-plastic-hd\.jpg|offshore-wind-hd\.jpg|seagrass-meadow-zostera-hd\.jpg|sponge-city-rain-garden-hd\.jpg)|sdg/E_SDG_Icons-(?:0[1-9]|1[0-7])\.jpg|vendor/three/three\.(?:core|module)\.min\.js)$ [NC]
+  RewriteRule ^assets/ - [R=404,L,NC]
+  RewriteRule ^(?:README\.md|LOESUNGEN\.md|server\.js|package(?:-lock)?\.json|Dockerfile|compose\.ya?ml|\.dockerignore|\.gitignore|\.env.*)$ - [R=404,L,NC]
   RewriteRule ^api/?$ backend.php?route=/health [L,QSA]
   RewriteRule ^api/(.*)$ backend.php?route=/$1 [L,QSA]
   RewriteRule ^uploads/([a-f0-9]{32}\.jpg)$ backend.php?route=/uploads/$1 [L,QSA]
   RewriteRule ^(de|en)/?$ index.html [L]
   RewriteRule ^de/(lernen|assistent|artikel(?:/[^/]+)?|ueber-uns|kontakt|publizieren|impressum|datenschutz)/?$ index.html [L]
   RewriteRule ^en/(learn|assistant|articles(?:/[^/]+)?|about|contact|publish|imprint|privacy)/?$ index.html [L]
-  RewriteRule ^\.git/ - [F,L]
-  RewriteRule ^data/ - [F,L]
-  RewriteRule ^(server\.js|package\.json|package-lock\.json|Dockerfile|\.dockerignore|\.gitignore)$ - [F,L]
 </IfModule>
 
-<FilesMatch "^(server\.js|package\.json|package-lock\.json|README\.md|Dockerfile|\.dockerignore|\.gitignore)$">
+<FilesMatch "(?i)\.(pdf|docx?|xlsx?|pptx?|odt|ods|odp|rtf|csv|zip|tar|gz|tgz|7z|rar|key|pem|p12|pfx|sqlite3?|db|log|bak|tmp|map)$">
+  Require all denied
+</FilesMatch>
+
+<FilesMatch "^(server\.js|package\.json|package-lock\.json|README\.md|LOESUNGEN\.md|Dockerfile|compose\.ya?ml|\.dockerignore|\.gitignore|\.env.*)$">
   Require all denied
 </FilesMatch>

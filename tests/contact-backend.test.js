@@ -146,6 +146,50 @@ test("contact backend validates, stores and securely delivers messages", async (
   t.after(() => fs.rm(dataDir, { recursive: true, force: true }));
   await waitForHealth(baseUrl, child, () => stderr);
 
+  const publicArticleCorpus = await fetch(`${baseUrl}/content/articles.json`);
+  assert.equal(publicArticleCorpus.status, 200);
+  assert.ok(Array.isArray(await publicArticleCorpus.json()));
+  const publicLogo = await fetch(`${baseUrl}/assets/cyri-logo.svg`);
+  assert.equal(publicLogo.status, 200);
+  assert.match(publicLogo.headers.get("content-type"), /^image\/svg\+xml/);
+
+  const privatePaths = [
+    "/README.md",
+    "/LOESUNGEN.md",
+    "/package.json",
+    "/server.js",
+    "/.env.example",
+    "/.git/config",
+    "/.claude/settings.local.json",
+    "/data/messages.json",
+    "/tests/contact-backend.test.js",
+    "/test-results/.last-run.json",
+    "/Antrag/antragsbestaetigung_dsee-act-1-081-041_2026-06-07.pdf",
+    "/Drei%20passgenaue%20Artikelpakete%20fu%CC%88r%20CYRI.pdf",
+    "/content/test2.tmp",
+    "/content/private.pdf",
+    "/content/",
+    "/assets/private.pdf",
+    "/assets/private.jpg",
+    "/assets/private.js",
+    "/assets/.DS_Store",
+    "/assets/vendor/three/LICENSE",
+    "/assets/",
+    "/assets/%2e%2e/package.json",
+    "/content/%2e%2e/server.js",
+    "/assets/cyri-logo.svg%00.pdf",
+  ];
+  for (const privatePath of privatePaths) {
+    const privateResponse = await fetch(`${baseUrl}${privatePath}`);
+    assert.equal(privateResponse.status, 404, privatePath);
+    assert.equal(privateResponse.headers.get("cache-control"), "no-store");
+    assert.deepEqual(await privateResponse.json(), { error: "Not found." });
+  }
+  const privateHeadResponse = await fetch(`${baseUrl}/assets/private.pdf`, {
+    method: "HEAD",
+  });
+  assert.equal(privateHeadResponse.status, 404);
+
   const germanLearningResponse = await fetch(`${baseUrl}/de/lernen`);
   assert.equal(germanLearningResponse.status, 200);
   const germanLearningHtml = await germanLearningResponse.text();
