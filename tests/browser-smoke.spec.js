@@ -123,6 +123,43 @@ test("homepage SDG cards open official logo details accessibly", async ({ page }
   await modal.screenshot({ path: "/tmp/cyri-home-sdg-detail-mobile.png" });
 });
 
+test("learning balloon title toggles a dark-green neon light", async ({ page }) => {
+  await setAdultMode(page, null, "de");
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("http://127.0.0.1:5173/de/lernen");
+
+  const neonToggle = page.locator("[data-learn-neon-toggle]");
+  await expect(neonToggle).toHaveText("Lernen");
+  await expect(neonToggle).toHaveAttribute("aria-pressed", "false");
+  await expect(neonToggle).toHaveAttribute("aria-label", "Dunkelgrünes Neonlicht einschalten");
+  await neonToggle.screenshot({ path: "/tmp/cyri-learn-neon-off.png" });
+
+  const filterOff = await neonToggle.evaluate((element) => getComputedStyle(element).filter);
+  await neonToggle.click();
+  await expect(neonToggle).toHaveClass(/is-neon-on/);
+  await expect(neonToggle).toHaveAttribute("aria-pressed", "true");
+  await expect(neonToggle).toHaveAttribute("aria-label", "Dunkelgrünes Neonlicht ausschalten");
+  const filterOn = await neonToggle.evaluate((element) => getComputedStyle(element).filter);
+  expect(filterOn).not.toBe(filterOff);
+  await neonToggle.screenshot({ path: "/tmp/cyri-learn-neon-on.png" });
+
+  await neonToggle.click();
+  await expect(neonToggle).not.toHaveClass(/is-neon-on/);
+  await expect(neonToggle).toHaveAttribute("aria-pressed", "false");
+  await neonToggle.focus();
+  await page.keyboard.press("Enter");
+  await expect(neonToggle).toHaveAttribute("aria-pressed", "true");
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const learningHeroFitsViewport = await page.evaluate(() => {
+    const title = document.querySelector("[data-learn-neon-toggle]");
+    const bounds = title?.getBoundingClientRect();
+    return Boolean(bounds && bounds.left >= 0 && bounds.right <= window.innerWidth);
+  });
+  expect(learningHeroFitsViewport).toBe(true);
+  await neonToggle.screenshot({ path: "/tmp/cyri-learn-neon-mobile.png" });
+});
+
 test("clean localized URLs expose page and article SEO metadata", async ({ page }) => {
   await setAdultMode(page, null, "de");
   await page.goto("http://127.0.0.1:5173/de/lernen");

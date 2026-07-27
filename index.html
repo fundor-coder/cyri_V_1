@@ -39,8 +39,8 @@
     <link rel="manifest" href="site.webmanifest" />
     <link rel="icon" href="assets/cyri-logo.svg" type="image/svg+xml" />
     <link rel="preload" href="assets/photos/coral-reef-bleaching-hd.webp" as="image" type="image/webp" fetchpriority="high" />
-    <link rel="stylesheet" href="styles.css?v=20260727-8" />
-    <script src="app.js?v=20260727-11" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260727-9" />
+    <script src="app.js?v=20260727-12" defer></script>
     <script type="application/ld+json" id="seo-structured-data">
       {
         "@context": "https://schema.org",
@@ -295,7 +295,18 @@
       <section class="page" data-page="learn">
         <section class="page-hero section learn-games-hero">
           <div class="shell reveal">
-            <h1 class="learn-balloon-title" data-i18n="nav.learn">Learn</h1>
+            <h1 class="learn-balloon-heading">
+              <button
+                class="learn-balloon-title"
+                type="button"
+                data-learn-neon-toggle
+                data-i18n="nav.learn"
+                aria-label="Turn on dark green neon light"
+                aria-pressed="false"
+              >
+                Learn
+              </button>
+            </h1>
           </div>
         </section>
 

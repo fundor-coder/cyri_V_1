@@ -1774,6 +1774,8 @@ const content = {
       skip: "Skip to content",
       menu: "Open navigation menu",
       close: "Close",
+      learnNeonOn: "Turn on dark green neon light",
+      learnNeonOff: "Turn off dark green neon light",
     },
     seo: {
       title: "CYRI | Climate & Environmental Education for Teens",
@@ -2447,6 +2449,8 @@ const content = {
       skip: "Zum Inhalt springen",
       menu: "Navigationsmenü öffnen",
       close: "Schließen",
+      learnNeonOn: "Dunkelgrünes Neonlicht einschalten",
+      learnNeonOff: "Dunkelgrünes Neonlicht ausschalten",
     },
     seo: {
       title: "CYRI | Umweltbildung für Jugendliche (Klima, Natur, Ozean)",
@@ -4007,6 +4011,17 @@ function updateRouteLinks() {
   });
 }
 
+function updateLearnNeonAccessibility() {
+  const toggle = document.querySelector("[data-learn-neon-toggle]");
+  if (!toggle) return;
+  const isOn = toggle.classList.contains("is-neon-on");
+  toggle.setAttribute("aria-pressed", String(isOn));
+  toggle.setAttribute(
+    "aria-label",
+    t(isOn ? "accessibility.learnNeonOff" : "accessibility.learnNeonOn")
+  );
+}
+
 function updateStaticText() {
   document.documentElement.lang = state.lang;
   updateSeo();
@@ -4026,6 +4041,7 @@ function updateStaticText() {
   document.querySelectorAll("[data-i18n-aria]").forEach((element) => {
     element.setAttribute("aria-label", t(element.dataset.i18nAria));
   });
+  updateLearnNeonAccessibility();
 
   document.querySelectorAll("[data-lang-button]").forEach((button) => {
     button.classList.toggle("is-active", button.dataset.langButton === state.lang);
@@ -7190,6 +7206,13 @@ function observeReveals() {
 }
 
 document.addEventListener("click", (event) => {
+  const learnNeonToggle = event.target.closest("[data-learn-neon-toggle]");
+  if (learnNeonToggle) {
+    learnNeonToggle.classList.toggle("is-neon-on");
+    updateLearnNeonAccessibility();
+    return;
+  }
+
   const languageButton = event.target.closest("[data-lang-button]");
   if (languageButton) {
     state.lang = languageButton.dataset.langButton;
