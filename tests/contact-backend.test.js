@@ -116,6 +116,46 @@ test("contact backend validates, stores and securely delivers messages", async (
   t.after(() => fs.rm(dataDir, { recursive: true, force: true }));
   await waitForHealth(baseUrl, child, () => stderr);
 
+  const germanLearningResponse = await fetch(`${baseUrl}/de/lernen`);
+  assert.equal(germanLearningResponse.status, 200);
+  const germanLearningHtml = await germanLearningResponse.text();
+  assert.match(germanLearningHtml, /<html lang="de">/);
+  assert.match(
+    germanLearningHtml,
+    /<title>Umweltbildung &amp; Klima-Lernen für Jugendliche \| CYRI<\/title>/
+  );
+  assert.match(
+    germanLearningHtml,
+    /<link rel="canonical" href="https:\/\/cyri\.online\/de\/lernen" \/>/
+  );
+  assert.match(germanLearningHtml, /"@type":"LearningResource"/);
+
+  const articleResponse = await fetch(
+    `${baseUrl}/de/artikel/schwammstadt-regenwasser-hitze-2026`
+  );
+  assert.equal(articleResponse.status, 200);
+  const articleHtml = await articleResponse.text();
+  assert.match(articleHtml, /Schwammstadt: Wie Städte Regenwasser speichern/);
+  assert.match(articleHtml, /<meta property="og:type" content="article" \/>/);
+  assert.match(articleHtml, /"@type":"Article"/);
+  assert.match(
+    articleHtml,
+    /https:\/\/cyri\.online\/en\/articles\/schwammstadt-regenwasser-hitze-2026/
+  );
+
+  const missingArticleResponse = await fetch(`${baseUrl}/de/artikel/nicht-vorhanden`);
+  assert.equal(missingArticleResponse.status, 404);
+
+  const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`);
+  assert.equal(sitemapResponse.status, 200);
+  const sitemap = await sitemapResponse.text();
+  assert.match(sitemap, /https:\/\/cyri\.online\/de\/lernen/);
+  assert.match(
+    sitemap,
+    /https:\/\/cyri\.online\/de\/artikel\/schwammstadt-regenwasser-hitze-2026/
+  );
+  assert.doesNotMatch(sitemap, /\/de\/publizieren/);
+
   const successResponse = await contactRequest(baseUrl, {
     name: "Alex Example",
     email: "alex@example.com",

@@ -1700,6 +1700,62 @@ const photoSources = [
 ];
 
 const API_BASES = ["backend.php?route=", "api"];
+const SITE_ORIGIN = "https://cyri.online";
+const routePaths = {
+  en: {
+    home: "/en/",
+    learn: "/en/learn",
+    research: "/en/assistant",
+    articles: "/en/articles",
+    about: "/en/about",
+    contact: "/en/contact",
+    publish: "/en/publish",
+    imprint: "/en/imprint",
+    privacy: "/en/privacy",
+  },
+  de: {
+    home: "/de/",
+    learn: "/de/lernen",
+    research: "/de/assistent",
+    articles: "/de/artikel",
+    about: "/de/ueber-uns",
+    contact: "/de/kontakt",
+    publish: "/de/publizieren",
+    imprint: "/de/impressum",
+    privacy: "/de/datenschutz",
+  },
+};
+const publicRoutePages = Object.keys(routePaths.en);
+
+function routeLanguageFromPath(pathname = window.location.pathname) {
+  if (pathname === "/de" || pathname.startsWith("/de/")) return "de";
+  if (pathname === "/en" || pathname.startsWith("/en/")) return "en";
+  return "";
+}
+
+function articleRoutePath(articleId, language = state?.lang || "en") {
+  return `${routePaths[language].articles}/${encodeURIComponent(articleId)}`;
+}
+
+function pageRoutePath(page, language = state?.lang || "en", anchor = null) {
+  if (page === "mission") return `${routePaths[language].home}#mission`;
+  const base = routePaths[language][page] || routePaths[language].home;
+  return anchor ? `${base}#${encodeURIComponent(anchor)}` : base;
+}
+
+function routeAbsoluteUrl(page, language = state?.lang || "en", articleId = null) {
+  const path = articleId
+    ? articleRoutePath(articleId, language)
+    : pageRoutePath(page, language);
+  return new URL(path, SITE_ORIGIN).toString();
+}
+
+function preserveCurrentSearch(path) {
+  if (!window.location.search) return path;
+  const [pathname, hash = ""] = path.split("#");
+  return `${pathname}${window.location.search}${hash ? `#${hash}` : ""}`;
+}
+
 const PUBLISH_SESSION_KEY = "cyri-publish-token";
 const HOMEPAGE_ARTICLE_COUNT = 5;
 const HOMEPAGE_ARTICLE_ROTATION_MS = 12 * 1000;
@@ -1708,6 +1764,7 @@ const SITE_FEATURES = {
   publishActionFunding: true,
 };
 let articleModalReturnFocus = null;
+let articleModalReturnUrl = null;
 let homeSdgModalReturnFocus = null;
 let homepageArticleRotationTimer = null;
 
@@ -1724,19 +1781,19 @@ const content = {
         "CYRI is a youth-led digital info platform for climate, nature and environmental protection.",
       pages: {
         home: {
-          title: "CYRI | Climate & Environmental Education for Teens",
+          title: "CYRI | Environmental Education & 17 SDGs for Young People",
           description:
-            "Youth-led environmental education connecting climate, nature and the 17 Sustainable Development Goals through articles, learning games and interactive models.",
+            "CYRI offers youth-led environmental education on climate, nature and all 17 Sustainable Development Goals through sourced articles and interactive learning.",
         },
         learn: {
-          title: "Climate Learning Games for Teens | CYRI",
+          title: "Environmental & Climate Learning for Teens | CYRI",
           description:
-            "Play interactive climate and environmental learning games for teens (15-19) and classrooms, from 5-minute challenges to 30-minute deep dives.",
+            "Free environmental and climate learning for ages 15-19, teachers and classrooms with interactive challenges linked to all 17 Sustainable Development Goals.",
         },
         articles: {
-          title: "Articles | CYRI",
+          title: "Climate, Nature & Sustainability Articles | CYRI",
           description:
-            "Read CYRI articles on climate policy, renewable energy, biodiversity, marine protection and sustainable cities.",
+            "Source-based environmental articles for young people about climate action, biodiversity, oceans, renewable energy, sustainable cities and the 17 SDGs.",
         },
         research: {
           title: "CYRI Assistant | CYRI",
@@ -1744,7 +1801,7 @@ const content = {
             "Ask questions and receive AI-assisted answers based only on published CYRI environmental articles.",
         },
         about: {
-          title: "About | CYRI",
+          title: "About CYRI | Youth-led Environmental Education",
           description:
             "Read about CYRI, a two-person youth-led environmental info platform currently in development in Germany.",
         },
@@ -2397,19 +2454,19 @@ const content = {
         "CYRI ist eine jugendgeführte digitale Infoplattform für Klima-, Natur- und Umweltschutz.",
       pages: {
         home: {
-          title: "CYRI | Umweltbildung für Jugendliche (Klima, Natur, Ozean)",
+          title: "CYRI | Umweltbildung & 17 Nachhaltigkeitsziele für Jugendliche",
           description:
-            "Jugendgeführte Umweltbildung, die Klima, Natur und die 17 Nachhaltigkeitsziele mit Artikeln, Lernspielen und interaktiven Modellen verbindet.",
+            "CYRI bietet jugendgeführte Umweltbildung zu Klima, Natur und allen 17 Nachhaltigkeitszielen – mit fundierten Artikeln und interaktivem Lernen.",
         },
         learn: {
-          title: "Klima-Lernspiele für Jugendliche | CYRI",
+          title: "Umweltbildung & Klima-Lernen für Jugendliche | CYRI",
           description:
-            "Spiele interaktive Umwelt- und Klima-Lernspiele für Jugendliche (15-19) und den Unterricht – von 5-Minuten-Challenges bis zu 30-Minuten-Vertiefungen.",
+            "Kostenlose Umwelt- und Klimabildung für Jugendliche von 15 bis 19 Jahren, Lehrkräfte und Unterricht – interaktiv verbunden mit allen 17 Nachhaltigkeitszielen.",
         },
         articles: {
-          title: "Artikel | CYRI",
+          title: "Umweltwissen: Klima, Natur & Nachhaltigkeit | CYRI",
           description:
-            "Lies CYRI-Artikel zu Klimapolitik, erneuerbarer Energie, Biodiversität, Meeresschutz und nachhaltigen Städten.",
+            "Fundierte Umweltartikel für Jugendliche über Klimaschutz, Biodiversität, Meere, erneuerbare Energie, nachhaltige Städte und die 17 Nachhaltigkeitsziele.",
         },
         research: {
           title: "CYRI-Assistent | CYRI",
@@ -2417,7 +2474,7 @@ const content = {
             "Stelle Fragen und erhalte KI-gestützte Antworten auf Basis veröffentlichter CYRI-Artikel.",
         },
         about: {
-          title: "Über uns | CYRI",
+          title: "Über CYRI | Jugendgeführte Umweltbildung",
           description:
             "Erfahre mehr über CYRI, eine zweiköpfige jugendgeführte Plattform für Umweltbildung im Aufbau in Deutschland.",
         },
@@ -3229,7 +3286,10 @@ const savedGameProgress = loadGameProgress();
 const savedCertificateIssuance = loadCertificateIssuance();
 
 const state = {
-  lang: localStorage.getItem("cyri-language") || (navigator.language.startsWith("de") ? "de" : "en"),
+  lang:
+    routeLanguageFromPath() ||
+    localStorage.getItem("cyri-language") ||
+    (navigator.language.startsWith("de") ? "de" : "en"),
   page: "home",
   anchor: null,
   filter: "all",
@@ -3813,7 +3873,7 @@ async function loadArticlesFromBackend() {
     const payload = await apiRequest("/articles");
     state.publishedArticles = Array.isArray(payload.articles) ? payload.articles : [];
     renderArticles();
-    if (state.activeArticleId) updateArticleModal();
+    if (state.activeArticleId) syncArticleModalToRoute();
     return true;
   } catch {
     state.publishedArticles = [];
@@ -3829,7 +3889,7 @@ async function loadStaticArticles() {
     const payload = await response.json();
     articles.splice(0, articles.length, ...(Array.isArray(payload) ? payload : []));
     renderArticles();
-    if (state.activeArticleId) updateArticleModal();
+    if (state.activeArticleId) syncArticleModalToRoute();
     return true;
   } catch {
     articles.splice(0, articles.length);
@@ -3921,6 +3981,23 @@ function updatePublishScheduleControls() {
   submitButton.textContent = t(later ? "publish.scheduleSubmit" : "publish.submit");
 }
 
+function updateRouteLinks() {
+  const skipLink = document.querySelector(".skip-link");
+  if (skipLink) {
+    skipLink.href = `${window.location.pathname}#main`;
+  }
+  document.querySelectorAll("[data-route-link]").forEach((link) => {
+    const destination = link.dataset.routeLink;
+    link.href = pageRoutePath(destination, state.lang);
+    if (destination === "home") {
+      link.setAttribute(
+        "aria-label",
+        state.lang === "de" ? "CYRI Startseite" : "CYRI home"
+      );
+    }
+  });
+}
+
 function updateStaticText() {
   document.documentElement.lang = state.lang;
   updateSeo();
@@ -3946,6 +4023,7 @@ function updateStaticText() {
     button.setAttribute("aria-pressed", String(button.dataset.langButton === state.lang));
   });
 
+  updateRouteLinks();
   updateAudienceInterface();
 }
 
@@ -4025,24 +4103,145 @@ function setAudience(audience) {
 
 function updateSeo() {
   const seo = content[state.lang].seo.pages[state.page] || content[state.lang].seo;
-  document.title = seo.title;
+  const article =
+    state.page === "articles" && state.activeArticleId
+      ? allArticles().find((item) => item.id === state.activeArticleId)
+      : null;
+  const articleCopy = article ? localizedArticle(article) : null;
+  const pageTitle = articleCopy ? `${articleCopy.title} | CYRI` : seo.title;
+  const pageDescription = articleCopy?.summary || seo.description;
+  const pageUrl = routeAbsoluteUrl(
+    state.page,
+    state.lang,
+    article?.id || null
+  );
+  const alternatePage = state.page === "publish" ? "publish" : state.page;
+  const alternateDe = routeAbsoluteUrl(alternatePage, "de", article?.id || null);
+  const alternateEn = routeAbsoluteUrl(alternatePage, "en", article?.id || null);
+  document.title = pageTitle;
   const description = document.querySelector('meta[name="description"]');
   const ogTitle = document.querySelector('meta[property="og:title"]');
   const ogDescription = document.querySelector('meta[property="og:description"]');
+  const ogType = document.querySelector('meta[property="og:type"]');
+  const ogUrl = document.querySelector('meta[property="og:url"]');
+  const ogLocale = document.querySelector('meta[property="og:locale"]');
+  const ogImage = document.querySelector('meta[property="og:image"]');
+  const ogImageAlt = document.querySelector('meta[property="og:image:alt"]');
   const twitterTitle = document.querySelector('meta[name="twitter:title"]');
   const twitterDescription = document.querySelector('meta[name="twitter:description"]');
+  const twitterImage = document.querySelector('meta[name="twitter:image"]');
+  const twitterImageAlt = document.querySelector('meta[name="twitter:image:alt"]');
+  const canonical = document.querySelector('link[rel="canonical"]');
+  const alternateLinks = document.querySelectorAll('link[rel="alternate"][hreflang]');
   let robots = document.querySelector('meta[name="robots"]');
   if (!robots) {
     robots = document.createElement("meta");
     robots.name = "robots";
     document.head.append(robots);
   }
-  if (description) description.content = seo.description;
-  if (ogTitle) ogTitle.content = seo.title;
-  if (ogDescription) ogDescription.content = seo.description;
-  if (twitterTitle) twitterTitle.content = seo.title;
-  if (twitterDescription) twitterDescription.content = seo.description;
-  robots.content = state.page === "publish" ? "noindex, nofollow" : "index, follow";
+  if (description) description.content = pageDescription;
+  if (ogTitle) ogTitle.content = pageTitle;
+  if (ogDescription) ogDescription.content = pageDescription;
+  if (ogType) ogType.content = article ? "article" : "website";
+  if (ogUrl) ogUrl.content = pageUrl;
+  if (ogLocale) ogLocale.content = state.lang === "de" ? "de_DE" : "en_GB";
+  if (twitterTitle) twitterTitle.content = pageTitle;
+  if (twitterDescription) twitterDescription.content = pageDescription;
+  if (canonical) canonical.href = pageUrl;
+  alternateLinks.forEach((link) => {
+    const language = link.getAttribute("hreflang");
+    link.href = language === "de" ? alternateDe : language === "en" ? alternateEn : SITE_ORIGIN;
+  });
+  const defaultImage = `${SITE_ORIGIN}/assets/photos/coral-reef-bleaching-hd.webp`;
+  const articleImage = article ? new URL(getArticlePhoto(article).src, SITE_ORIGIN).toString() : "";
+  const socialImage = articleImage || defaultImage;
+  const socialImageAlt = articleCopy?.title || t("hero.imageAlt");
+  if (ogImage) ogImage.content = socialImage;
+  if (ogImageAlt) ogImageAlt.content = socialImageAlt;
+  if (twitterImage) twitterImage.content = socialImage;
+  if (twitterImageAlt) twitterImageAlt.content = socialImageAlt;
+  robots.content =
+    state.page === "publish"
+      ? "noindex, nofollow"
+      : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+  updateStructuredData(article, pageUrl, pageTitle, pageDescription, socialImage);
+}
+
+function updateStructuredData(article, pageUrl, pageTitle, pageDescription, socialImage) {
+  const node = document.querySelector("#seo-structured-data");
+  if (!node) return;
+  const graph = [
+    {
+      "@type": "EducationalOrganization",
+      "@id": `${SITE_ORIGIN}/#organization`,
+      name: "CYRI",
+      alternateName: "Climate Youth Research Initiative",
+      url: `${SITE_ORIGIN}/`,
+      logo: `${SITE_ORIGIN}/assets/cyri-logo.svg`,
+      description:
+        state.lang === "de"
+          ? "Jugendgeführte Umweltbildung zu Klima, Natur und den 17 Nachhaltigkeitszielen."
+          : "Youth-led environmental education about climate, nature and the 17 Sustainable Development Goals.",
+      areaServed: "Germany",
+      email: "climateyri@gmail.com",
+      founder: [
+        { "@type": "Person", name: "Tobias Göppert" },
+        { "@type": "Person", name: "Jarne Bub" },
+      ],
+      sameAs: [
+        "https://www.instagram.com/cyri.de/",
+        "https://www.linkedin.com/company/cyri/",
+        "https://x.com/ClimateYRI",
+      ],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_ORIGIN}/#website`,
+      url: `${SITE_ORIGIN}/`,
+      name: "CYRI",
+      alternateName: "Climate Youth Research Initiative",
+      inLanguage: ["de", "en"],
+      publisher: { "@id": `${SITE_ORIGIN}/#organization` },
+    },
+  ];
+
+  if (article) {
+    graph.push({
+      "@type": "Article",
+      "@id": `${pageUrl}#article`,
+      mainEntityOfPage: pageUrl,
+      headline: localizedValue(article.title),
+      description: localizedValue(article.summary),
+      image: [socialImage],
+      datePublished: article.date,
+      dateModified: article.updatedAt?.slice(0, 10) || article.date,
+      inLanguage: state.lang,
+      isAccessibleForFree: true,
+      author: { "@id": `${SITE_ORIGIN}/#organization` },
+      publisher: { "@id": `${SITE_ORIGIN}/#organization` },
+    });
+  } else if (state.page === "learn") {
+    graph.push({
+      "@type": "LearningResource",
+      "@id": `${pageUrl}#learning-resource`,
+      name: pageTitle,
+      description: pageDescription,
+      url: pageUrl,
+      inLanguage: state.lang,
+      isAccessibleForFree: true,
+      educationalLevel: "Secondary education",
+      typicalAgeRange: "15-19",
+      learningResourceType: ["Interactive learning", "Educational game"],
+      about: [
+        "Environmental education",
+        "Climate education",
+        "Sustainable Development Goals",
+      ],
+      provider: { "@id": `${SITE_ORIGIN}/#organization` },
+    });
+  }
+
+  node.textContent = JSON.stringify({ "@context": "https://schema.org", "@graph": graph });
 }
 
 function renderMissionFocus() {
@@ -6332,9 +6531,13 @@ function renderArticleCard(article, featured = false) {
       </div>
       <h3>${escapeHtml(presentation.title)}</h3>
       <p>${escapeHtml(presentation.summary)}</p>
-      <button class="card-button" type="button" data-article-id="${escapeHtml(article.id)}">
+      <a
+        class="card-button"
+        href="${escapeHtml(articleRoutePath(article.id))}"
+        data-article-id="${escapeHtml(article.id)}"
+      >
         ${escapeHtml(t("articles.readMore"))}
-      </button>
+      </a>
     </article>
   `;
 }
@@ -6671,6 +6874,29 @@ function renderDynamicContent() {
 }
 
 function parseRoute() {
+  const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
+  const pathLanguage = routeLanguageFromPath(pathname);
+  const language = pathLanguage || state.lang;
+  const articleBase = routePaths[language].articles;
+  if (pathname.startsWith(`${articleBase}/`)) {
+    const articleId = decodeURIComponent(pathname.slice(articleBase.length + 1));
+    return { page: "articles", anchor: null, language, articleId, legacy: false };
+  }
+
+  const cleanPage = publicRoutePages.find((page) => {
+    const candidate = routePaths[language][page].replace(/\/+$/, "") || "/";
+    return pathname === candidate;
+  });
+  if (cleanPage) {
+    return {
+      page: cleanPage,
+      anchor: window.location.hash === "#mission" && cleanPage === "home" ? "mission" : null,
+      language,
+      articleId: null,
+      legacy: false,
+    };
+  }
+
   const raw = window.location.hash.replace("#", "") || "home";
   const learnAnchors = new Set(["learn-games"]);
   const legacyLearnAnchors = new Set([
@@ -6681,12 +6907,28 @@ function parseRoute() {
     "learn-map",
     "learn-quiz",
   ]);
-  if (raw === "mission") return { page: "home", anchor: "mission" };
-  if (raw === "research") return { page: "research", anchor: null };
-  if (learnAnchors.has(raw)) return { page: "learn", anchor: raw };
-  if (legacyLearnAnchors.has(raw)) return { page: "learn", anchor: "learn-games" };
-  if (routes.has(raw)) return { page: raw, anchor: null };
-  return { page: "home", anchor: null };
+  if (raw === "mission") {
+    return { page: "home", anchor: "mission", language, articleId: null, legacy: true };
+  }
+  if (raw === "research") {
+    return { page: "research", anchor: null, language, articleId: null, legacy: true };
+  }
+  if (learnAnchors.has(raw)) {
+    return { page: "learn", anchor: raw, language, articleId: null, legacy: true };
+  }
+  if (legacyLearnAnchors.has(raw)) {
+    return {
+      page: "learn",
+      anchor: "learn-games",
+      language,
+      articleId: null,
+      legacy: true,
+    };
+  }
+  if (routes.has(raw)) {
+    return { page: raw, anchor: null, language, articleId: null, legacy: true };
+  }
+  return { page: "home", anchor: null, language, articleId: null, legacy: pathname === "/" };
 }
 
 function showPage(shouldScroll = true) {
@@ -6730,9 +6972,27 @@ function showPage(shouldScroll = true) {
 
 function syncRoute(shouldScroll = true) {
   const route = parseRoute();
+  const languageChanged = route.language !== state.lang;
+  state.lang = route.language;
   state.page = route.page;
   state.anchor = route.anchor;
+  state.activeArticleId = route.articleId;
+  if (route.legacy) {
+    const cleanPath = pageRoutePath(route.page, route.language, route.anchor);
+    window.history.replaceState(null, "", preserveCurrentSearch(cleanPath));
+  }
+  if (languageChanged) updateStaticText();
   showPage(shouldScroll);
+  syncArticleModalToRoute();
+}
+
+function navigateToRoute(page, options = {}) {
+  const language = options.language || state.lang;
+  const path = options.articleId
+    ? articleRoutePath(options.articleId, language)
+    : pageRoutePath(page, language, options.anchor || null);
+  window.history.pushState(null, "", path);
+  syncRoute(options.shouldScroll !== false);
 }
 
 function closeMenu() {
@@ -6790,10 +7050,18 @@ function buildPublishedArticle(form) {
 }
 
 function openArticle(id) {
-  articleModalReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-  state.activeArticleId = id;
-  markLearningArticleRead(id);
+  articleModalReturnFocus =
+    document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  articleModalReturnUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  navigateToRoute("articles", { articleId: id, shouldScroll: false });
+}
+
+function revealRoutedArticle() {
+  const article = allArticles().find((item) => item.id === state.activeArticleId);
+  if (!article) return;
+  markLearningArticleRead(article.id);
   updateArticleModal();
+  updateSeo();
   const modal = document.querySelector("[data-article-modal]");
   modal.hidden = false;
   modal.setAttribute("aria-hidden", "false");
@@ -6801,12 +7069,33 @@ function openArticle(id) {
   document.querySelector("[data-modal-close]").focus();
 }
 
-function closeArticle() {
-  state.activeArticleId = null;
+function hideArticleModal() {
   const modal = document.querySelector("[data-article-modal]");
   modal.hidden = true;
   modal.setAttribute("aria-hidden", "true");
   document.body.classList.remove("no-scroll");
+}
+
+function syncArticleModalToRoute() {
+  const modal = document.querySelector("[data-article-modal]");
+  if (state.activeArticleId) {
+    revealRoutedArticle();
+  } else if (!modal.hidden) {
+    hideArticleModal();
+  }
+}
+
+function closeArticle() {
+  hideArticleModal();
+  state.activeArticleId = null;
+  const returnUrl = articleModalReturnUrl;
+  articleModalReturnUrl = null;
+  if (returnUrl) {
+    window.history.pushState(null, "", returnUrl);
+  } else {
+    window.history.replaceState(null, "", pageRoutePath("articles", state.lang));
+  }
+  syncRoute(false);
   articleModalReturnFocus?.focus();
   articleModalReturnFocus = null;
 }
@@ -6896,6 +7185,10 @@ document.addEventListener("click", (event) => {
   if (languageButton) {
     state.lang = languageButton.dataset.langButton;
     localStorage.setItem("cyri-language", state.lang);
+    const localizedPath = state.activeArticleId
+      ? articleRoutePath(state.activeArticleId, state.lang)
+      : pageRoutePath(state.page, state.lang, state.anchor);
+    window.history.replaceState(null, "", localizedPath);
     updateStaticText();
     renderDynamicContent();
     resetResearchAnswer();
@@ -7470,6 +7763,7 @@ document.addEventListener("click", (event) => {
 
   const articleButton = event.target.closest("[data-article-id]");
   if (articleButton) {
+    event.preventDefault();
     openArticle(articleButton.dataset.articleId);
     return;
   }
@@ -7485,18 +7779,14 @@ document.addEventListener("click", (event) => {
     return;
   }
 
-  const internalLink = event.target.closest('a[href^="#"]');
-  if (internalLink) {
-    const target = internalLink.getAttribute("href");
-    if (target.length > 1) {
-      event.preventDefault();
-      closeMenu();
-      if (window.location.hash === target) {
-        syncRoute(true);
-      } else {
-        window.location.hash = target;
-      }
-    }
+  const routeLink = event.target.closest("[data-route-link]");
+  if (routeLink) {
+    event.preventDefault();
+    closeMenu();
+    const destination = routeLink.dataset.routeLink;
+    navigateToRoute(destination === "mission" ? "home" : destination, {
+      anchor: destination === "mission" ? "mission" : null,
+    });
   }
 });
 
@@ -7795,6 +8085,10 @@ document.querySelector("[data-publish-form]").addEventListener("submit", async (
 });
 
 window.addEventListener("hashchange", () => syncRoute(true));
+window.addEventListener("popstate", () => {
+  articleModalReturnUrl = null;
+  syncRoute(true);
+});
 document.addEventListener("visibilitychange", scheduleHomepageArticleRotation);
 
 window.addEventListener("keydown", (event) => {

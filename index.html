@@ -2,12 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CYRI | Climate & Environmental Education for Teens</title>
     <meta
       name="description"
       content="Youth-led environmental education connecting climate, nature and the 17 Sustainable Development Goals through articles, learning games and interactive models."
     />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="author" content="CYRI – Climate Youth Research Initiative" />
+    <meta name="application-name" content="CYRI" />
+    <meta name="cyri-initial-page" content="home" />
+    <meta name="cyri-initial-language" content="en" />
     <meta name="theme-color" content="#f7fbfa" />
     <meta property="og:title" content="CYRI | Climate & Environmental Education for Teens" />
     <meta
@@ -15,6 +22,8 @@
       content="Youth-led environmental education connecting climate, nature and all 17 Sustainable Development Goals."
     />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="CYRI" />
+    <meta property="og:locale" content="en_GB" />
     <meta property="og:url" content="https://cyri.online/" />
     <meta property="og:image" content="https://cyri.online/assets/photos/coral-reef-bleaching-hd.webp" />
     <meta property="og:image:alt" content="A coral reef affected by bleaching" />
@@ -22,31 +31,49 @@
     <meta name="twitter:title" content="CYRI | Climate & Environmental Education for Teens" />
     <meta name="twitter:description" content="Environmental education connecting climate, nature and all 17 Sustainable Development Goals." />
     <meta name="twitter:image" content="https://cyri.online/assets/photos/coral-reef-bleaching-hd.webp" />
+    <meta name="twitter:image:alt" content="CYRI environmental education about climate, nature and sustainability" />
     <link rel="canonical" href="https://cyri.online/" />
+    <link rel="alternate" hreflang="de" href="https://cyri.online/de/" />
+    <link rel="alternate" hreflang="en" href="https://cyri.online/en/" />
+    <link rel="alternate" hreflang="x-default" href="https://cyri.online/" />
     <link rel="manifest" href="site.webmanifest" />
     <link rel="icon" href="assets/cyri-logo.svg" type="image/svg+xml" />
     <link rel="preload" href="assets/photos/coral-reef-bleaching-hd.webp" as="image" type="image/webp" fetchpriority="high" />
-    <link rel="stylesheet" href="styles.css?v=20260727-7" />
-    <script src="app.js?v=20260727-7" defer></script>
-    <script type="application/ld+json">
+    <link rel="stylesheet" href="styles.css?v=20260727-8" />
+    <script src="app.js?v=20260727-10" defer></script>
+    <script type="application/ld+json" id="seo-structured-data">
       {
         "@context": "https://schema.org",
-        "@type": "EducationalOrganization",
-        "name": "CYRI",
-        "alternateName": "Climate Youth Research Initiative",
-        "url": "https://cyri.online/",
-        "logo": "https://cyri.online/assets/cyri-logo.svg",
-        "description": "Youth-led digital platform offering interactive climate, ocean and nature education for teens and teachers.",
-        "areaServed": "DE",
-        "audience": {
-          "@type": "EducationalAudience",
-          "educationalRole": "student",
-          "audienceType": "Teens 15-19 and teachers"
-        },
-        "sameAs": [
-          "https://www.instagram.com/cyri.de/",
-          "https://www.linkedin.com/company/cyri/",
-          "https://x.com/ClimateYRI"
+        "@graph": [
+          {
+            "@type": "EducationalOrganization",
+            "@id": "https://cyri.online/#organization",
+            "name": "CYRI",
+            "alternateName": "Climate Youth Research Initiative",
+            "url": "https://cyri.online/",
+            "logo": "https://cyri.online/assets/cyri-logo.svg",
+            "description": "Youth-led environmental education connecting climate, nature and the 17 Sustainable Development Goals.",
+            "areaServed": "Germany",
+            "email": "climateyri@gmail.com",
+            "founder": [
+              { "@type": "Person", "name": "Tobias Göppert" },
+              { "@type": "Person", "name": "Jarne Bub" }
+            ],
+            "sameAs": [
+              "https://www.instagram.com/cyri.de/",
+              "https://www.linkedin.com/company/cyri/",
+              "https://x.com/ClimateYRI"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://cyri.online/#website",
+            "url": "https://cyri.online/",
+            "name": "CYRI",
+            "alternateName": "Climate Youth Research Initiative",
+            "inLanguage": ["de", "en"],
+            "publisher": { "@id": "https://cyri.online/#organization" }
+          }
         ]
       }
     </script>
@@ -56,7 +83,7 @@
 
     <header class="site-header" data-header>
       <nav class="nav shell" aria-label="Primary navigation">
-        <a class="brand" href="#home" aria-label="CYRI home">
+        <a class="brand" href="/en/" data-route-link="home" aria-label="CYRI home">
           <img class="brand-mark" src="assets/cyri-logo.svg" alt="" aria-hidden="true" />
           <span class="brand-text">CYRI</span>
         </a>
@@ -75,11 +102,11 @@
 
         <div class="nav-panel" id="primary-navigation" data-nav-panel>
           <div class="nav-links">
-            <a href="#home" data-nav-link="home" data-i18n="nav.home">Home</a>
-            <a href="#mission" data-nav-link="mission" data-i18n="nav.mission">Mission</a>
-            <a href="#learn" data-nav-link="learn" data-i18n="nav.learn">Learn</a>
-            <a href="#about" data-nav-link="about" data-i18n="nav.about">About</a>
-            <a href="#contact" data-nav-link="contact" data-i18n="nav.contact">Contact</a>
+            <a href="/en/" data-route-link="home" data-nav-link="home" data-i18n="nav.home">Home</a>
+            <a href="/en/#mission" data-route-link="mission" data-nav-link="mission" data-i18n="nav.mission">Mission</a>
+            <a href="/en/learn" data-route-link="learn" data-nav-link="learn" data-i18n="nav.learn">Learn</a>
+            <a href="/en/about" data-route-link="about" data-nav-link="about" data-i18n="nav.about">About</a>
+            <a href="/en/contact" data-route-link="contact" data-nav-link="contact" data-i18n="nav.contact">Contact</a>
           </div>
 
           <div class="language-switcher" aria-label="Language">
@@ -106,10 +133,10 @@
                 belong together.
               </p>
               <div class="hero-actions">
-                <a class="button button-primary" href="#learn" data-i18n="hero.primaryCta">
+                <a class="button button-primary" href="/en/learn" data-route-link="learn" data-i18n="hero.primaryCta">
                   Start exploring
                 </a>
-                <a class="button button-secondary" href="#articles" data-i18n="hero.secondaryCta">
+                <a class="button button-secondary" href="/en/articles" data-route-link="articles" data-i18n="hero.secondaryCta">
                   Read articles
                 </a>
               </div>
@@ -137,7 +164,7 @@
                   environmental facts.
                 </p>
               </div>
-              <a class="section-link" href="#learn" data-i18n="learningIntro.cta">
+              <a class="section-link" href="/en/learn" data-route-link="learn" data-i18n="learningIntro.cta">
                 Explore CYRI info tools
               </a>
             </div>
@@ -160,7 +187,7 @@
                   food, energy, cities, justice and international cooperation.
                 </p>
               </div>
-              <a class="section-link" href="#learn" data-i18n="homeSdgs.cta">
+              <a class="section-link" href="/en/learn" data-route-link="learn" data-i18n="homeSdgs.cta">
                 Explore the goals
               </a>
             </div>
@@ -187,7 +214,7 @@
                 In the learning section, you can test these connections through environmental
                 challenges and the SDG Sprint.
               </p>
-              <a class="button button-primary" href="#learn" data-i18n="homeSdgs.actionCta">
+              <a class="button button-primary" href="/en/learn" data-route-link="learn" data-i18n="homeSdgs.actionCta">
                 Start environmental learning
               </a>
             </div>
@@ -231,7 +258,7 @@
                   New source-based CYRI info articles appear here automatically.
                 </p>
               </div>
-              <a class="section-link" href="#articles" data-i18n="latest.viewAll">View all articles</a>
+              <a class="section-link" href="/en/articles" data-route-link="articles" data-i18n="latest.viewAll">View all articles</a>
             </div>
 
             <div class="article-grid latest-grid reveal" data-latest-articles></div>
@@ -833,7 +860,7 @@
     <footer class="site-footer">
       <div class="shell footer-grid">
         <div class="footer-brand">
-          <a class="brand" href="#home" aria-label="CYRI home">
+          <a class="brand" href="/en/" data-route-link="home" aria-label="CYRI home">
             <img class="brand-mark" src="assets/cyri-logo.svg" alt="" aria-hidden="true" />
             <span class="brand-text">CYRI</span>
           </a>
@@ -843,12 +870,12 @@
         </div>
 
         <nav class="footer-links" aria-label="Footer navigation">
-          <a href="#home" data-i18n="nav.home">Home</a>
-          <a href="#mission" data-i18n="nav.mission">Mission</a>
-          <a href="#learn" data-i18n="nav.learn">Learn</a>
-          <a href="#articles" data-i18n="nav.articles">Articles</a>
-          <a href="#about" data-i18n="nav.about">About</a>
-          <a href="#contact" data-i18n="nav.contact">Contact</a>
+          <a href="/en/" data-route-link="home" data-i18n="nav.home">Home</a>
+          <a href="/en/#mission" data-route-link="mission" data-i18n="nav.mission">Mission</a>
+          <a href="/en/learn" data-route-link="learn" data-i18n="nav.learn">Learn</a>
+          <a href="/en/articles" data-route-link="articles" data-i18n="nav.articles">Articles</a>
+          <a href="/en/about" data-route-link="about" data-i18n="nav.about">About</a>
+          <a href="/en/contact" data-route-link="contact" data-i18n="nav.contact">Contact</a>
         </nav>
 
         <div class="footer-language">
@@ -877,8 +904,8 @@
       <div class="shell footer-legal">
         <p>© 2026 CYRI</p>
         <nav aria-label="Legal and editor links">
-          <a href="#imprint" data-i18n="footer.imprint">Imprint</a>
-          <a href="#privacy" data-i18n="footer.privacy">Privacy</a>
+          <a href="/en/imprint" data-route-link="imprint" data-i18n="footer.imprint">Imprint</a>
+          <a href="/en/privacy" data-route-link="privacy" data-i18n="footer.privacy">Privacy</a>
         </nav>
       </div>
     </footer>
