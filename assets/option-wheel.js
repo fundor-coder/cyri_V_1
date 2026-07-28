@@ -6,12 +6,12 @@ if (root) {
   const hint = document.querySelector("[data-option-wheel-hint]");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const config = {
-    rowHeight: 55,
+    rowHeight: 92,
     curve: 0.86,
     tilt: 10,
     blur: 0.7,
-    fade: 0.23,
-    minOpacity: 0.08,
+    fade: 0.2,
+    minOpacity: 0.16,
     smoothing: 180,
   };
 
@@ -103,6 +103,11 @@ if (root) {
     layout();
   }
 
+  function resizeWheel() {
+    config.rowHeight = Math.min(90, Math.max(68, root.clientHeight / 9.8));
+    layout();
+  }
+
   root.addEventListener("wheel", (event) => {
     event.preventDefault();
     const delta = event.deltaMode === 1 ? event.deltaY * 24 : event.deltaY;
@@ -144,7 +149,10 @@ if (root) {
 
   root.addEventListener("click", (event) => {
     const item = event.target.closest(".option-wheel__item");
-    if (!item) return;
+    if (!item) {
+      document.dispatchEvent(new CustomEvent("cyri:menu-close"));
+      return;
+    }
     if (dragMoved) {
       event.preventDefault();
       event.stopPropagation();
@@ -170,6 +178,7 @@ if (root) {
   });
 
   document.addEventListener("cyri:menu-open", syncToCurrentPage);
+  new ResizeObserver(resizeWheel).observe(root);
   new MutationObserver(updateLanguageHint).observe(document.documentElement, {
     attributes: true,
     attributeFilter: ["lang"],
@@ -177,4 +186,5 @@ if (root) {
 
   updateLanguageHint();
   syncToCurrentPage();
+  resizeWheel();
 }

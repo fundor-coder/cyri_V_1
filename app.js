@@ -7854,10 +7854,18 @@ document.querySelector("[data-menu-toggle]").addEventListener("click", () => {
 
 document.addEventListener("pointerdown", (event) => {
   const header = document.querySelector("[data-header]");
-  if (header.classList.contains("is-menu-open") && !header.contains(event.target)) {
+  const clickedPanelBackdrop =
+    event.target.closest("[data-nav-panel]") &&
+    !event.target.closest("[data-option-wheel]");
+  if (
+    header.classList.contains("is-menu-open") &&
+    (!header.contains(event.target) || clickedPanelBackdrop)
+  ) {
     closeMenu();
   }
 });
+
+document.addEventListener("cyri:menu-close", closeMenu);
 
 document.querySelectorAll('input[name="publishMode"]').forEach((input) => {
   input.addEventListener("change", updatePublishScheduleControls);
